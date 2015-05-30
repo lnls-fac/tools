@@ -16,7 +16,7 @@ require_once('FacTextReplacer.php');
 
 $wgExtensionCredits['other'][] = array(
     'name' => 'Parameters',
-    'version' => '0.2.0',
+    'version' => '0.3.0',
     'author' => array('Afonso Haruo Carnielli Mukai'),
     'description' => 'Include parameterised and derived values in articles'
 );

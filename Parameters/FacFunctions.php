@@ -263,4 +263,11 @@ function id_mean_power($energy, $current, $period, $nr_periods, $k)
     return ($cst * $energy * $k*$k * $nr_periods / ($period/1000.0))/1000.0;
 }
 
+function fac_write($filename, $text)
+{
+    $f = fopen('/tmp/' . $filename . '.txt', 'a');
+    fwrite($f, $text . "\n");
+    fclose($f);
+}
+
 ?>
