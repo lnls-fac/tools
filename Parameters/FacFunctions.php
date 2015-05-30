@@ -1,5 +1,10 @@
 <?php
 
+# Parameter page prefix
+class FacParameterBase {
+    const parameter_prefix = "FAC:Parameter:";
+}
+
 # Constants
 $light_speed = 299792458; # [m/s] - definition
 $vacuum_permeability = 4*pi()*1e-7; # [T.m/A] - definition
@@ -261,6 +266,13 @@ function id_mean_power($energy, $current, $period, $nr_periods, $k)
 
     $cst = pi() * 1e9 * $rad_cgamma * pow(joule_2_ev($electron_rest_energy)/1.0e9, 2);
     return ($cst * $energy * $k*$k * $nr_periods / ($period/1000.0))/1000.0;
+}
+
+function fac_write($filename, $text)
+{
+    $f = fopen('/tmp/' . $filename . '.txt', 'a');
+    fwrite($f, $text . "\n");
+    fclose($f);
 }
 
 ?>

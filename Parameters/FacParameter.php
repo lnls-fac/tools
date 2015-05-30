@@ -4,9 +4,7 @@ require_once('FacTable.php');
 require_once('FacValueExtractor.php');
 
 
-class FacParameter {
-    const parameter_namespace = "Parameter:";
-
+class FacParameter extends FacParameterBase {
     static $valid_fields = array(
         'group', 'symbol', 'units', 'is_derived', 'value'
     );
@@ -15,8 +13,8 @@ class FacParameter {
 
     public static function get_name_if_parameter($title)
     {
-        $n = strlen(self::parameter_namespace);
-        if (substr($title, 0, $n) != self::parameter_namespace)
+        $n = strlen(self::parameter_prefix);
+        if (substr($title, 0, $n) != self::parameter_prefix)
             return false;
         else
             return substr($title, $n);

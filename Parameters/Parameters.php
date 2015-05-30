@@ -2,7 +2,7 @@
 /*
  * Parameters extension.
  *
- * Read and write parameters to and from database.
+ * Include parameterised and derived values in articles.
  */
 
 if (!defined('MEDIAWIKI')) {
@@ -16,7 +16,7 @@ require_once('FacTextReplacer.php');
 
 $wgExtensionCredits['other'][] = array(
     'name' => 'Parameters',
-    'version' => '0.2.0',
+    'version' => '0.3.0',
     'author' => array('Afonso Haruo Carnielli Mukai'),
     'description' => 'Include parameterised and derived values in articles'
 );
@@ -161,7 +161,7 @@ function fac_get_parameter_link($name, $label=false)
     if (!$label)
         $label = $name;
 
-    $s = '[[' . FacParameter::parameter_namespace . $name . '|'
+    $s = '[[' . FacParameter::parameter_prefix . $name . '|'
         . $label . ']]';
     return $s;
 }
@@ -360,17 +360,19 @@ function fac_page_content_save(&$wikiPage, &$user, &$content, &$summary,
 
 function fac_title_move(Title $title, Title $newTitle, User $user)
 {
-    $ns = substr(FacParameter::parameter_namespace, 0, -1); # remove colon
+    $p = FacParameter::parameter_prefix;
+    $n = strlen($p);
 
-    $old_ns = $title->getSubjectNsText();
-    $new_ns = $newTitle->getSubjectNsText();
+    $old_name = $title->getSubjectNsText() . ':' . $title->getText();
+    $new_name = $newTitle->getSubjectNsText() . ':' . $newTitle->getText();
 
-    if(($old_ns != $ns) or ($new_ns != $ns))
+
+    if (!fac_starts_with($old_name, $p) or !fac_starts_with($new_name, $p))
         return true; # not in parameter namespace
 
     try {
-        $prm = new FacParameterWriter($title->getText());
-        $prm->rename($newTitle->getText());
+        $prm = new FacParameterWriter(substr($old_name, $n));
+        $prm->rename(substr($new_name, $n));
     } catch(FacException $e) {
         return false;
     }
@@ -381,15 +383,19 @@ function fac_title_move(Title $title, Title $newTitle, User $user)
 function fac_abort_move(Title $oldTitle, Title $newTitle, User $user,
     &$error, $reason)
 {
-    $ns = substr(FacParameter::parameter_namespace, 0, -1); # remove colon
+    $p = FacParameter::parameter_prefix;
+    $n = strlen($p);
 
-    if ($oldTitle->getSubjectNsText() != $ns) {
-        if ($newTitle->getSubjectNsText() == $ns) {
+    $old_name = $oldTitle->getSubjectNsText() . ':' . $oldTitle->getText();
+    $new_name = $newTitle->getSubjectNsText() . ':' . $newTitle->getText();
+
+    if (!fac_starts_with($old_name, $p)) {
+        if (fac_starts_with($new_name, $p)) {
             $error = 'Cannot move to parameter namespace';
             return false;
         }
     } else {
-        if ($newTitle->getSubjectNsText() != $ns) {
+        if (!fac_starts_with($new_name, $p)) {
             $error = 'Cannot move out of parameter namespace';
             return false;
         } else {
@@ -427,6 +433,18 @@ function fac_article_delete(WikiPage &$wikiPage, User &$user, &$reason,
         $error = fac_get_coloured_text($e->getMessage());
         return false;
     }
+}
+
+function fac_starts_with($haystack, $needle)
+{
+    if (strlen($haystack)==0 or strlen($needle)==0)
+        return false;
+
+    $pos = strpos($haystack, $needle);
+    if ($pos === 0)
+        return true;
+    else
+        return false;
 }
 
 ?>
