@@ -360,12 +360,11 @@ function fac_page_content_save(&$wikiPage, &$user, &$content, &$summary,
 
 function fac_title_move(Title $title, Title $newTitle, User $user)
 {
-    $p = FacParameter::parameter_prefix;
-    $n = strlen($p);
-
     $old_name = $title->getSubjectNsText() . ':' . $title->getText();
     $new_name = $newTitle->getSubjectNsText() . ':' . $newTitle->getText();
-
+    
+    $p = FacParameter::parameter_prefix;
+    $n = strlen($p);
 
     if (!fac_starts_with($old_name, $p) or !fac_starts_with($new_name, $p))
         return true; # not in parameter namespace
@@ -383,11 +382,11 @@ function fac_title_move(Title $title, Title $newTitle, User $user)
 function fac_abort_move(Title $oldTitle, Title $newTitle, User $user,
     &$error, $reason)
 {
-    $p = FacParameter::parameter_prefix;
-    $n = strlen($p);
-
     $old_name = $oldTitle->getSubjectNsText() . ':' . $oldTitle->getText();
     $new_name = $newTitle->getSubjectNsText() . ':' . $newTitle->getText();
+    
+    $p = FacParameter::parameter_prefix;
+    $n = strlen($p);
 
     if (!fac_starts_with($old_name, $p)) {
         if (fac_starts_with($new_name, $p)) {
