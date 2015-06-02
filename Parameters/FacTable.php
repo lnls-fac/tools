@@ -409,6 +409,13 @@ class FacEvaluator extends FacConnection {
         if (substr_count($expression, '"') % 2)
             throw new FacException('quote mismatch');
 
+        # Substitute whitespace for underscore in parameter names
+        $parts = explode('"', $expression);
+        for ($i = 0; $i < count($parts); $i++)
+            if ($i % 2)
+                $parts[$i] = str_replace('_', ' ', $parts[$i]);
+        $expression = implode('"', $parts);
+
         $dt = new FacDependencyTracker($expression);
         $deps = $dt->get_dependencies();
 

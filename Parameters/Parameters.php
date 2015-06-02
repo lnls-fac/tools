@@ -1,8 +1,8 @@
 <?php
 /*
- * Parameters extension.
+ * Parameters extension
  *
- * Read and write parameters to and from database.
+ * Include parameterised and derived values in articles.
  */
 
 if (!defined('MEDIAWIKI')) {
