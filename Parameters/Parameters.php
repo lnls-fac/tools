@@ -16,7 +16,7 @@ require_once('FacTextReplacer.php');
 
 $wgExtensionCredits['other'][] = array(
     'name' => 'Parameters',
-    'version' => '0.4.0',
+    'version' => '0.5.0',
     'author' => array('Afonso Haruo Carnielli Mukai'),
     'description' => 'Include parameterised and derived values in articles'
 );
@@ -39,6 +39,7 @@ function fac_parameter_parser_init(Parser $parser)
     $parser->setHook("dependencies", "fac_dependencies_parameter_render");
     $parser->setHook("dependents", "fac_dependents_parameter_render");
     $parser->setHook("parameter_list", "fac_parameter_list_parameter_render");
+    $parser->setHook("math_expr", "fac_math_expression_render");
 
     return true;
 }
@@ -237,6 +238,23 @@ function fac_get_parameter_list_text($parameters)
     $text .= "# " . $last;
 
     return $text;
+}
+
+function fac_math_expression_render($input, array $args, Parser $parser,
+    PPFrame $frame)
+{
+    try {
+        $evaluator = new FacMathExpressionEvaluator($input);
+        $output = $evaluator->evaluate();
+    } catch (FacException $e) {
+        $output = fac_get_error_message('Error: ' . $e->getMessage());
+    }
+
+    $format = fac_get_arg_value('format', $args);
+    if ($format !== false)
+        $output = fac_format_value($format, $output);
+
+    return $parser->recursiveTagParse($output, $frame);
 }
 
 function fac_edit_form_preload_text(&$text, &$title)

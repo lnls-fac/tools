@@ -240,4 +240,16 @@ class FacParameterLister {
     }
 }
 
+class FacMathExpressionEvaluator {
+    function __construct($expression)
+    {
+        $this->evaluator = new FacEvaluator('', $expression);
+    }
+
+    function evaluate()
+    {
+        return $this->evaluator->evaluate();
+    }
+}
+
 ?>
