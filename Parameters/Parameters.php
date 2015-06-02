@@ -16,7 +16,7 @@ require_once('FacTextReplacer.php');
 
 $wgExtensionCredits['other'][] = array(
     'name' => 'Parameters',
-    'version' => '0.3.0',
+    'version' => '0.4.0',
     'author' => array('Afonso Haruo Carnielli Mukai'),
     'description' => 'Include parameterised and derived values in articles'
 );
@@ -62,6 +62,11 @@ function fac_get_sirius_parameter_with_args($fields, $args)
     $field = fac_get_arg_value('field', $args);
     $format = fac_get_arg_value('format', $args);
     $link = fac_get_arg_value('link', $args);
+    $a = fac_get_arg_value('a', $args);
+    $b = fac_get_arg_value('b', $args);
+
+    if ($a or $b)
+        $fields['value'] = fac_apply_affine($fields['value'], $a, $b);
 
     if ($format)
         $fields['value'] = fac_format_value($format, $fields['value']);
@@ -75,7 +80,6 @@ function fac_get_sirius_parameter_with_args($fields, $args)
         return $fields[$field];
     else
         return $fields['value'] . " " . $fields['units'];
-
 }
 
 function fac_get_arg_value($arg, array $args)
@@ -84,6 +88,21 @@ function fac_get_arg_value($arg, array $args)
         return $args[$arg];
     else
         return false;
+}
+
+function fac_apply_affine($value, $a, $b)
+{
+    if ($a === false)
+        $a = 1;
+    else
+        $a = floatval($a);
+
+    if ($b === false)
+        $b = 0;
+    else
+        $b = floatval($b);
+
+    return strval($a*floatval($value) + $b);
 }
 
 function fac_format_value($format, $value)
