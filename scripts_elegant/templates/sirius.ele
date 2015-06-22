@@ -1,0 +1,13 @@
+&run_setup
+	lattice = <lattice>.<extension>
+!    use_beamline = sup4c
+	use_beamline = anelab
+	p_central_mev = 3e3
+	default_order = 2
+	magnets = <lattice>.mag
+&end
+
+&twiss_output
+	filename = <lattice>.twi
+	radiation_integrals = 1
+&end

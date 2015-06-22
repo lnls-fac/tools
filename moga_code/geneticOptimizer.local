@@ -1,0 +1,52 @@
+#!/bin/sh
+# \
+exec oagtclsh "$0" "$@"
+
+# These two procedures may need to be customized to your installation.
+# If so, then this file (i.e,. your modified version of it) needs to
+# be in the directory from which you run geneticOptimizer.
+
+proc SubmitJob {args} {
+    set code ""
+    set input ""
+    APSStrictParseArguments {code input}
+
+    eval file delete -force $input.log [file rootname $input].done
+    set tmpFile [file rootname $input].csh
+    set fd [open $tmpFile w]
+    puts $fd "#!/bin/csh "
+#    puts $fd "source ~/.cshrc"
+    puts $fd "unset savehist"
+    puts $fd "echo running $code $input on [exec uname -a]"
+    puts $fd "cd [pwd]"
+    puts $fd "$code $input >& $input.log"
+    close $fd
+
+    catch {exec cat $tmpFile | qsub -V -o [pwd] -j oe -N [file root [file tail $input]] } result
+
+    return "$result"
+}
+
+proc SubmitRunScript {args} {
+    set script ""
+    set tagList ""
+    set valueList ""
+    set rootname ""
+    APSStrictParseArguments {script rootname tagList valueList}
+
+    eval file delete -force $rootname.log $rootname.done $rootname.run
+    set tmpFile [file rootname $rootname].csh
+    APSAddToTempFileList $tmpFile
+    set fd [open $tmpFile w]
+    puts $fd "#!/bin/csh "
+#    puts $fd "source ~/.cshrc"
+    puts $fd "unset savehist"
+    puts $fd "echo running $script $rootname $tagList $valueList on [exec uname -a]"
+    puts $fd "cd [pwd]"
+    puts $fd "$script -rootname $rootname -tagList '$tagList' -valueList '$valueList' >& $rootname.log"
+    close $fd
+
+    catch {exec cat $tmpFile | qsub -q linux.q -V -o [pwd] -j y -N [file root [file tail $rootname]] } result
+
+    return "$result"
+}

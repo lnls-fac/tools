@@ -1,0 +1,129 @@
+! Match one sector to the desired tunes, with other constraints
+
+&run_setup
+	lattice = <lattice_old>
+	p_central_mev = 3e3,
+	use_beamline = sup4c,
+	default_order = 3,
+&end
+
+&twiss_output
+	matched = 1,
+    output_at_each_step = 1
+    concat_order = 3
+    radiation_integrals = 0
+    compute_driving_terms = 1
+    higher_order_chromaticity = 1
+&end
+
+&run_control &end
+
+&optimization_setup
+!        equation = ex0
+        method = "simplex"
+        tolerance = 1e-14, target = 0,
+        n_passes = 1, n_evaluations = 50, n_restarts = 1,
+        log_file = /dev/null,
+        verbose =0
+        output_sparsing_factor = 300
+&end
+
+!&optimization_term term = "max.betax 20 .00001 segt" &end
+!&optimization_term term = "max.betay 29 .00001 segt" &end
+!&optimization_term term = "MIA#1.etax 0 .00000001 sene" &end
+!&optimization_term term = "MIA#1.betay 5.8 .001 segt" &end
+!&optimization_term term = "MIB#1.etax 0 .000001 sene" &end
+!&optimization_term term = "MIB#1.betay 1.8 .0001 sene" &end
+!&optimization_term term = "MIB#1.betax 1.8 .0001 sene" &end
+!&optimization_term term = "MC#1.alphay 0 .0000001 sene" &end
+!&optimization_term term = "MC#1.alphax 0 .0000001 sene" &end
+!&optimization_term term = "MIB#2.etax 0 .00000001 sene" &end
+!&optimization_term term = "MIB#2.betay 1.8 .00001 segt" &end
+!&optimization_term term = "MIB#2.betax 1.8 .00001 segt" &end
+!&optimization_term term = "MC#2.alphay 0 .0000001 sene" &end
+!&optimization_term term = "MC#2.alphax 0 .0000001 sene" &end
+
+&optimization_term term = "dbetax/dp 0 0.1 sene" &end
+&optimization_term term = "dbetay/dp 0 0.1 sene" &end
+&optimization_term term = "dnux/dp 0.4 .000001 sene" &end
+&optimization_term term = "dnuy/dp 0.4 .000001 sene" &end
+&optimization_term term = "dnux/dp2 0 .001 sene" &end
+&optimization_term term = "dnuy/dp2 0 .001 sene" &end
+&optimization_term term = "dnux/dp3 0 1.0 sene" &end
+&optimization_term term = "dnuy/dp3 0 1.0 sene" &end
+&optimization_term term = "dnux/dJx 0 1 sene" &end
+&optimization_term term = "dnuy/dJy 0 1 sene" &end
+&optimization_term term = "dnux/dJy 0 1 sene" &end
+&optimization_term term = "h21000 0 .001 sene" &end
+&optimization_term term = "h30000 0 .001 sene" &end
+&optimization_term term = "h10110 0 .001 sene" &end
+&optimization_term term = "h10020 0 .001 sene" &end
+&optimization_term term = "h10200 0 .001 sene" &end
+&optimization_term term = "h20001 0 .001 sene" &end
+&optimization_term term = "h00201 0 .001 sene" &end
+&optimization_term term = "h10002 0 .001 sene" &end
+
+!&optimization_term term = "h31000 0 .01 sene" &end
+!&optimization_term term = "h40000 0 .01 sene" &end
+!&optimization_term term = "h20110 0 .01 sene" &end
+!&optimization_term term = "h11200 0 .01 sene" &end
+!&optimization_term term = "h20020 0 .01 sene" &end
+!&optimization_term term = "h20200 0 .01 sene" &end
+!&optimization_term term = "h00310 0 .01 sene" &end
+!&optimization_term term = "h00400 0 .01 sene" &end
+
+!&optimization_variable name = b1,  item=K1, lower_limit=-4.1, upper_limit=0.0, step_size=0.01 &end
+!&optimization_variable name = qfa, item=K1, lower_limit=0.0, upper_limit=5, step_size=0.01 &end
+!&optimization_variable name = qda, item=K1, lower_limit=-4.0, upper_limit=0.0, step_size=0.01 &end
+!&optimization_variable name = qf1, item=K1, lower_limit=0.0, upper_limit=5, step_size=0.01 &end
+!&optimization_variable name = qf2, item=K1, lower_limit=0.0, upper_limit=5, step_size=0.01 &end
+!&optimization_variable name = qf3, item=K1, lower_limit=0.0, upper_limit=5, step_size=0.01 &end
+!&optimization_variable name = qf4, item=K1, lower_limit=0.0, upper_limit=5, step_size=0.01 &end
+!&optimization_variable name = qb3, item=K1, lower_limit=-4.0, upper_limit=0, step_size=0.01 &end
+!&optimization_variable name = qfb, item=K1, lower_limit=0.0, upper_limit=4.6, step_size=0.01 &end
+!&optimization_variable name = qdb1,item=K1, lower_limit=-4.0, upper_limit=0.0, step_size=0.01 &end
+!&optimization_variable name = qdb2,item=K1, lower_limit=-4.0, upper_limit=0.0, step_size=0.01 &end
+
+&optimization_variable name = sda,  item=K2, lower_limit=-500,  upper_limit=500, step_size=0.01 &end
+&optimization_variable name = sfa,  item=K2, lower_limit=-500,  upper_limit=500, step_size=0.01 &end
+&optimization_variable name = sdb,  item=K2, lower_limit=-500,  upper_limit=500, step_size=0.01 &end
+&optimization_variable name = sfb,  item=K2, lower_limit=-500,  upper_limit=500, step_size=0.01 &end
+&optimization_variable name = sf1, item=K2, lower_limit=-500,  upper_limit=500, step_size=0.01 &end
+&optimization_variable name = sd1, item=K2, lower_limit=-500,  upper_limit=500, step_size=0.01 &end
+&optimization_variable name = sf2, item=K2, lower_limit=-500,  upper_limit=500, step_size=0.01 &end
+&optimization_variable name = sd2, item=K2, lower_limit=-500,  upper_limit=500, step_size=0.01 &end
+&optimization_variable name = sd3, item=K2, lower_limit=-500,  upper_limit=500, step_size=0.01 &end
+&optimization_variable name = sf3, item=K2, lower_limit=-500,  upper_limit=500, step_size=0.01 &end
+&optimization_variable name = sd4, item=K2, lower_limit=-500,  upper_limit=500, step_size=0.01 &end
+&optimization_variable name = sf4, item=K2, lower_limit=-500,  upper_limit=500, step_size=0.01 &end
+&optimization_variable name = sd5, item=K2, lower_limit=-500,  upper_limit=500, step_size=0.01 &end
+&optimization_variable name = sd6, item=K2, lower_limit=-500,  upper_limit=500, step_size=0.01 &end
+!&optimization_variable name = dsd11, item=L, lower_limit=0.17, upper_limit=0.61, step_size=0.01 &end
+!&optimization_variable name = dsd21, item=L, lower_limit=0.17, upper_limit=0.34, step_size=0.01 &end
+!&optimization_variable name = dsd31, item=L, lower_limit=0.17, upper_limit=0.46, step_size=0.01 &end
+
+!&optimization_covariable name = dsd12, item=L, equation = "DSD12.L0 DSD11.L0 DSD11.L - +" &end
+!&optimization_covariable name = dsd22, item=L, equation = "DSD22.L0 DSD21.L0 DSD21.L - +" &end
+!&optimization_covariable name = dsd32, item=L, equation = "DSD32.L0 DSD31.L0 DSD31.L - +" &end
+
+
+&bunched_beam &end
+&optimize &end
+&save_lattice filename = <lattice_new>.new &end
+
+&run_setup
+	lattice = <lattice_new>.new
+	p_central_mev = 3e3,
+	use_beamline = sup4c,
+	default_order = 3,
+    magnets = <lattice_new>.mag
+&end
+
+&twiss_output
+    radiation_integrals = 1
+	matched = 1,
+    filename = <lattice_new>.twi
+    concat_order = 3
+	compute_driving_terms = 1
+	higher_order_chromaticity = 1
+&end

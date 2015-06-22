@@ -1,0 +1,274 @@
+! 6 step run:
+! 2. Track to get tunes vs momentum offset
+! 3. Turn off sextupoles, add errors and correct orbit
+! 4. Load errors and correctors and correct again, with sextupoles on
+! 5. Determine on-momentum DA
+! 6. Determine momentum aperture
+
+! Track particles with variable initial momentum offset in order to find our where the
+! integer and half-integer resonances get crossed
+&run_setup
+        lattice = <rootname>.new,
+        use_beamline = anelw,
+        p_central_mev = 3e3
+        default_order = 2
+	    final = %s.fin
+        semaphore_file = %s.done0
+        rootname = <rootname>
+&end
+&twiss_output
+	concat_order = 2
+	radiation_integrals = 1
+&end
+
+&alter_elements name=MALIN, item=ON_PASS, value=0 &end
+&alter_elements name=MALIN, item=DX, value=1e-6 &end
+&alter_elements name=MALIN, item=DY, value=1e-6 &end
+&closed_orbit
+    iteration_fraction = 0.1
+    closed_orbit_iterations = 500
+&end
+&run_control
+	n_passes = 128
+	n_indices = 1
+&end
+&vary_element
+    name=MALIN,
+    item=DP,
+    initial=-0.055,
+    final=0.055,
+    index_number=0,
+    index_limit=51
+&end
+&bunched_beam &end
+&track center_on_orbit=1 &end
+
+
+!Turn off sextupoles, add errors and correct orbit
+! must not include vacuum chambers
+&run_setup
+    lattice = <rootname>.new,
+    use_beamline = anelrf,
+    p_central_mev = 3e3,
+    default_order = 2,
+    random_number_seed = 19041988,
+    rootname = <rootname>,
+    tracking_updates = 0
+    parameters = %s.param2
+&end
+&alter_elements name = SFA, item = K2, value = 0.0 &end
+&alter_elements name = SDA, item = K2, value = 0.0 &end
+&alter_elements name = SFB, item = K2, value = 0.0 &end
+&alter_elements name = SDB, item = K2, value = 0.0 &end
+&alter_elements name = SD2, item = K2, value = 0.0 &end
+&alter_elements name = SD3, item = K2, value = 0.0 &end
+&alter_elements name = SF2, item = K2, value = 0.0 &end
+&alter_elements name = SD1, item = K2, value = 0.0 &end
+&alter_elements name = SF1, item = K2, value = 0.0 &end
+&alter_elements name = SD5, item = K2, value = 0.0 &end
+&alter_elements name = SD4, item = K2, value = 0.0 &end
+&alter_elements name = SF3, item = K2, value = 0.0 &end
+&alter_elements name = SD6, item = K2, value = 0.0 &end
+&alter_elements name = SF4, item = K2, value = 0.0 &end
+
+! turn off vacuum chamber
+&alter_elements name = AMPIVU, item = X_MAX, value = 1 &end
+&alter_elements name = AMPIVU, item = Y_MAX, value = 1 &end
+&alter_elements name = AMPOVU, item = X_MAX, value = 1 &end
+&alter_elements name = AMPOVU, item = Y_MAX, value = 1 &end
+&alter_elements name = AMPVAC, item = X_MAX, value = 1 &end
+&alter_elements name = AMPVAC, item = Y_MAX, value = 1 &end
+
+&twiss_output
+	matched = 1 , radiation_integrals = 1
+&end
+&run_control
+    n_steps = <nsteps>
+&end
+&error_control error_log = %s.erl &end
+&error_element name = *, type = gaussian, cutoff = 1.0, element_type=KQUAD, item = DX, bind = 0, amplitude = 40e-6 &end
+&error_element name = *, type = gaussian, cutoff = 1.0, element_type=KQUAD, item = DY, bind = 0, amplitude = 40e-6 &end
+&error_element name = *, type = gaussian, cutoff = 1.0, element_type=KSEXT, item = DX, bind = 0, amplitude = 40e-6 &end
+&error_element name = *, type = gaussian, cutoff = 1.0, element_type=KSEXT, item = DY, bind = 0, amplitude = 40e-6 &end
+&error_element name = *, type = gaussian, cutoff = 1.0, element_type=CSBEND, item = DX, bind = 0, amplitude = 40e-6 &end
+&error_element name = *, type = gaussian, cutoff = 1.0, element_type=CSBEND, item = DY, bind = 0, amplitude = 40e-6 &end
+&error_element name = *, type = gaussian, cutoff = 1.0, element_type=KQUAD, item = FSE, bind = 0, amplitude = 5e-4 &end
+&error_element name = *, type = gaussian, cutoff = 1.0, element_type=KSEXT, item = FSE, bind = 0, amplitude = 5e-4 &end
+&error_element name = *, type = gaussian, cutoff = 1.0, element_type=CSBEND,item = FSE, bind = 0, amplitude = 5e-4 &end
+&error_element name = *, type = gaussian, cutoff = 1.0, element_type=KQUAD, item = TILT, bind = 0, amplitude = 2e-4 &end
+&error_element name = *, type = gaussian, cutoff = 1.0, element_type=KSEXT, item = TILT, bind = 0, amplitude = 2e-4 &end
+&error_element name = *, type = gaussian, cutoff = 1.0, element_type=CSBEND,item = ETILT, bind = 0, amplitude = 2e-4 &end
+&correct
+  	disable = 0,
+    mode = "orbit", method = "global",
+    verbose = 1, n_iterations = 4, n_xy_cycles = 100,
+    correction_fraction[0] = 0.5, 0.5,
+    bpm_noise[0] = 0e-6, 0e-6,
+    correction_accuracy[0] = 1e-6, 1e-6,
+    corrector_output = "%s.cor1",
+    closed_orbit_iteration_fraction = 0.5
+    closed_orbit_iterations = 500,
+    closed_orbit_accuracy = 1e-9,
+  	keep_largest_SVs[0] = 0, 0
+&end
+&bunched_beam &end
+&track &end
+
+
+! load errors and correctors and correct again, with sextupoles on
+! must not include vacuum chambers
+
+&run_setup
+    lattice = <rootname>.new,
+    use_beamline = anelrf,
+    p_central_mev = 3e3,
+    default_order = 2,
+    rootname = <rootname>,
+    tracking_updates = 0
+    parameters = %s.param3
+&end
+&load_parameters
+    filename = %s.erl,
+    force_occurence_data = 0
+&end
+&load_parameters
+    filename = %s.param2,
+    force_occurence_data = 1,
+    include_name_pattern = C*,
+&end
+
+! turn off vacuum chamber
+&alter_elements name = AMPIVU, item = X_MAX, value = 1 &end
+&alter_elements name = AMPIVU, item = Y_MAX, value = 1 &end
+&alter_elements name = AMPOVU, item = X_MAX, value = 1 &end
+&alter_elements name = AMPOVU, item = Y_MAX, value = 1 &end
+&alter_elements name = AMPVAC, item = X_MAX, value = 1 &end
+&alter_elements name = AMPVAC, item = Y_MAX, value = 1 &end
+
+&twiss_output
+	matched = 1 , radiation_integrals = 1
+&end
+&run_control
+    n_steps = <nsteps>
+&end
+&correct
+	disable = 0,
+    mode = "orbit", method = "global",
+    verbose = 1, n_iterations = 4, n_xy_cycles = 100,
+    correction_fraction[0] = 0.5, 0.5,
+    bpm_noise[0] = 0e-6, 0e-6,
+    correction_accuracy[0] = 1e-6, 1e-6,
+    trajectory_output = "%s.orb",
+    corrector_output = "%s.cor2",
+    statistics = "%s.scor",
+    closed_orbit_iteration_fraction = 0.5
+    closed_orbit_iterations = 500,
+    closed_orbit_accuracy = 1e-9,
+    prezero_correctors = 0,
+	keep_largest_SVs[0] = 0, 0
+&end
+&bunched_beam &end
+&track &end
+
+
+! track for dynamic aperture with radiation damping
+&run_setup
+    lattice = <rootname>.new,
+    use_beamline = anelrf,
+    p_central_mev = 3e3
+    default_order = 2
+    rootname = <rootname>
+    semaphore_file = %s.done0
+    magnets = %s.mag
+    random_number_seed = 0
+&end
+&twiss_output
+   output_at_each_step = 0
+   concat_order = 2
+   matched = 1
+   radiation_integrals = 1
+&end
+&load_parameters
+    filename = %s.erl,
+    force_occurence_data = 0
+&end
+&load_parameters
+    filename = %s.param3,
+    force_occurence_data = 1,
+    include_name_pattern = C*,
+&end
+&twiss_output
+    filename = %s.twi2
+    output_at_each_step = 1
+    concat_order = 2
+    radiation_integrals = 1
+&end
+&run_control
+	n_passes = <turns>
+    n_steps = <nsteps>
+&end
+&closed_orbit
+    output  = %s.cod
+    iteration_fraction = 0.1
+    closed_orbit_iterations = 500
+&end
+&find_aperture
+    output = %s.aper
+    mode = "n-line",
+    n_lines = 11,
+    xmax = 0.014
+    ymax = 0.004
+    nx = 17
+    n_splits = 2,
+    verbosity = 1,
+&end
+
+
+! Determine momentum aperture at selected points in the first 6 sectors
+! We load the errors from the previous step
+&run_setup
+    lattice = <rootname>.new,
+    use_beamline = anelrf,
+    p_central_mev = 3e3
+    default_order = 2
+    semaphore_file = %s.done0
+    rootname = <rootname>
+&end
+&load_parameters
+    filename = %s.erl,
+    force_occurence_data = 0
+&end
+&load_parameters
+    filename = %s.param3,
+    force_occurence_data = 1,
+    include_name_pattern = C*,
+&end
+&twiss_output
+   output_at_each_step = 0
+   concat_order = 2
+   matched = 1
+   radiation_integrals = 1
+&end
+&run_control
+	n_passes = <turns>
+    n_steps = <nsteps>
+&end
+&momentum_aperture
+	output = %s.mmap,
+	x_initial = 1e-6,
+	y_initial = 1e-6,
+	delta_negative_start= -0.017
+	delta_negative_limit = -0.057,
+	delta_positive_start= 0.017
+	delta_positive_limit = 0.057,
+	delta_step_size = 0.005,
+	split_step_divisor = 3,
+    splits = 2,
+    steps_back = 1,
+	s_start = 0,
+	s_end = 51.9,
+	include_name_pattern = MCLCACP,
+	fiducialize = 0,
+	verbosity = 1,
+	soft_failure = 1
+&end

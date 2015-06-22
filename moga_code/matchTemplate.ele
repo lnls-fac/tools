@@ -1,0 +1,107 @@
+! 1.Match one sector to the desired tunes, with other constraints
+&run_setup
+	lattice = <lattice>
+	p_central_mev = 3e3,
+	use_beamline = sup4c,
+	default_order = 2,
+	parameters = %s.param,
+        final = %s.fin
+        rootname = <rootname>-linear,
+	semaphore_file = %s.done,
+&end
+
+&twiss_output
+	matched = 1,
+    output_at_each_step = 1
+    concat_order = 2
+    radiation_integrals = 1
+&end
+
+&run_control &end
+
+&optimization_setup
+    tolerance = 1e-14, target = 0,
+    n_passes = 3, n_evaluations = 1500, n_restarts = 5,
+    log_file = /dev/null,
+    verbose =0
+    output_sparsing_factor = 300
+&end
+
+&optimization_term term = "nux 5 * <nuxTarget> 0.0001 sene" &end
+&optimization_term term = "nuy 5 * <nuyTarget> 0.0001 sene" &end
+&optimization_term term = "max.betax 19 .1 segt" &end
+&optimization_term term = "max.betay 28 .1 segt" &end
+&optimization_term term = "etax 0 .0001 sene" &end
+&optimization_term term = "betay 5.5 .1 segt" &end
+&optimization_term term = "MIB#1.etax 0 .0001 sene" &end
+&optimization_term term = "MIB#1.betay 1.7 .01 segt" &end
+&optimization_term term = "MIB#1.betax 1.7 .01 segt" &end
+&optimization_term term = "MC#1.alphay 0 .001 sene" &end
+&optimization_term term = "MC#1.alphax 0 .001 sene" &end
+&optimization_term term = "MIB#2.etax 0 .0001 sene" &end
+&optimization_term term = "MIB#2.betay 1.7 .01 segt" &end
+&optimization_term term = "MIB#2.betax 1.7 .01 segt" &end
+&optimization_term term = "MC#2.alphay 0 .001 sene" &end
+&optimization_term term = "MC#2.alphax 0 .001 sene" &end
+
+&optimization_variable name = qfa, item=K1, lower_limit=0.0, upper_limit=5, step_size=0.01 &end
+&optimization_variable name = qda, item=K1, lower_limit=-4.0, upper_limit=0.0, step_size=0.01 &end
+&optimization_variable name = qf1, item=K1, lower_limit=0.0, upper_limit=5, step_size=0.01 &end
+&optimization_variable name = qf2, item=K1, lower_limit=0.0, upper_limit=5, step_size=0.01 &end
+&optimization_variable name = qf3, item=K1, lower_limit=0.0, upper_limit=5, step_size=0.01 &end
+&optimization_variable name = qf4, item=K1, lower_limit=0.0, upper_limit=5, step_size=0.01 &end
+&optimization_variable name = qb3, item=K1, lower_limit=-4.0, upper_limit=0, step_size=0.01 &end
+&optimization_variable name = qfb, item=K1, lower_limit=0.0, upper_limit=4.6, step_size=0.01 &end
+&optimization_variable name = qdb1,item=K1, lower_limit=-4.0, upper_limit=0.0, step_size=0.01 &end
+&optimization_variable name = qdb2,item=K1, lower_limit=-4.0, upper_limit=0.0, step_size=0.01 &end
+
+
+&bunched_beam &end
+&optimize &end
+
+! 2. Set sextupoles, adjust chromaticity
+&run_setup
+    lattice = <lattice>
+    use_beamline = anel,
+    p_central_mev = 3e3
+    default_order = 2
+    rootname = <rootname>
+    semaphore_file = %s.done0
+&end
+&load_parameters
+    filename_list = "<rootname>-linear.param",
+    allow_missing_elements = 1
+    change_defined_values = 1
+&end
+&alter_elements name = SDA, item = K2, value = <sda> &end
+&alter_elements name = SFA, item = K2, value = <sfa> &end
+&alter_elements name = SDB, item = K2, value = <sdb> &end
+&alter_elements name = SFB, item = K2, value = <sfb> &end
+&alter_elements name = SD2, item = K2, value = <sd2> &end
+&alter_elements name = SD3, item = K2, value = <sd3> &end
+&alter_elements name = SF2, item = K2, value = <sf2> &end
+&alter_elements name = SD6, item = K2, value = <sd6> &end
+&alter_elements name = SF1, item = K2, value = <sf1> &end
+&alter_elements name = SD1, item = K2, value = <sd1> &end
+&alter_elements name = SD4, item = K2, value = <sd4> &end
+&alter_elements name = SF3, item = K2, value = <sf3> &end
+&run_control &end
+&link_control &end
+&twiss_output
+	filename = %s.twi
+    output_at_each_step = 1
+    concat_order = 2
+	radiation_integrals = 1
+&end
+&chromaticity
+    sextupoles = "sf4 sd5",
+    strength_limit = 600,
+    dnux_dp = <xchrom>,
+    dnuy_dp = <ychrom>,
+    n_iterations = 10,
+    tolerance = 0.01
+    change_defined_values = 1
+&end
+&bunched_beam &end
+&track &end
+&save_lattice filename = %s.new &end

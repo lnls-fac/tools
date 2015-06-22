@@ -1,0 +1,12 @@
+&run_setup
+	lattice = SI_x01_s52.lte
+    use_beamline = sup4c
+	p_central_mev = 3e3
+	default_order = 2
+	magnets = %s.mag
+&end
+
+&twiss_output
+	filename = %s.twi
+	radiation_integrals = 1
+&end

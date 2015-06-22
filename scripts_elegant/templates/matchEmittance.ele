@@ -1,0 +1,96 @@
+! Match one sector to the desired tunes, with other constraints
+
+&run_setup
+	lattice = <lattice>.lte
+	p_central_mev = 3e3,
+	use_beamline = sup4c,
+	default_order = 2,
+&end
+
+&twiss_output
+	matched = 1,
+    output_at_each_step = 1
+    concat_order = 2
+    radiation_integrals = 1
+&end
+
+&run_control &end
+
+&optimization_setup
+!    method = "randomwalk"
+     method = "simplex"
+     tolerance = 1e-14, target = 0,
+     n_passes = 10, n_evaluations = 5000, n_restarts = 10,
+     log_file = /dev/null,
+     verbose =0
+     output_sparsing_factor = 300
+&end
+
+
+&optimization_term term = "ex0 2.0e-10 1e-10 segt" &end
+&optimization_term term = "max.betax 20 .1 segt" &end
+&optimization_term term = "max.betay 28 .1 segt" &end
+&optimization_term term = "MIA#1.etax 0 .0001 sene" &end
+&optimization_term term = "MIA#1.betay 5.5 .1 segt" &end
+&optimization_term term = "MIB#1.etax 0 .0001 sene" &end
+&optimization_term term = "MIB#1.betay 1.6 .01 sene" &end
+&optimization_term term = "MIB#1.betax 1.6 .01 sene" &end
+&optimization_term term = "MC#1.alphay 0 .001 sene" &end
+&optimization_term term = "MC#1.alphax 0 .001 sene" &end
+&optimization_term term = "MIB#2.etax 0 .0001 sene" &end
+&optimization_term term = "MIB#2.betay 1.6 .01 segt" &end
+&optimization_term term = "MIB#2.betax 1.6 .01 segt" &end
+&optimization_term term = "MC#2.alphay 0 .001 sene" &end
+&optimization_term term = "MC#2.alphax 0 .001 sene" &end
+
+
+&optimization_variable name = b1,  item=K1, lower_limit=-4.1, upper_limit=0.0, step_size=0.01 &end
+&optimization_variable name = qfa, item=K1, lower_limit=0.0, upper_limit=5, step_size=0.01 &end
+&optimization_variable name = qda, item=K1, lower_limit=-4.0, upper_limit=0.0, step_size=0.01 &end
+&optimization_variable name = qf1, item=K1, lower_limit=0.0, upper_limit=5, step_size=0.01 &end
+&optimization_variable name = qf2, item=K1, lower_limit=0.0, upper_limit=5, step_size=0.01 &end
+&optimization_variable name = qf3, item=K1, lower_limit=0.0, upper_limit=5, step_size=0.01 &end
+&optimization_variable name = qf4, item=K1, lower_limit=0.0, upper_limit=5, step_size=0.01 &end
+&optimization_variable name = qb3, item=K1, lower_limit=-4.0, upper_limit=0, step_size=0.01 &end
+&optimization_variable name = qfb, item=K1, lower_limit=0.0, upper_limit=4.6, step_size=0.01 &end
+&optimization_variable name = qdb1,item=K1, lower_limit=-4.0, upper_limit=0.0, step_size=0.01 &end
+&optimization_variable name = qdb2,item=K1, lower_limit=-4.0, upper_limit=0.0, step_size=0.01 &end
+
+
+
+!&optimization_variable name = b1,   item=L, lower_limit=0.1, upper_limit=3, step_size=0.01 &end
+!&optimization_variable name = b3,   item=L, lower_limit=0.1, upper_limit=3, step_size=0.01 &end
+!&optimization_variable name = la11, item=L, lower_limit=0.17, upper_limit=0.4, step_size=0.01 &end
+!&optimization_variable name = la2,  item=L, lower_limit=0.17, upper_limit=0.4, step_size=0.01 &end
+!&optimization_variable name = lb32, item=L, lower_limit=0.17, upper_limit=0.4, step_size=0.01 &end
+!&optimization_variable name = lb2,  item=L, lower_limit=0.17, upper_limit=0.4, step_size=0.01 &end
+!&optimization_variable name = lb11, item=L, lower_limit=0.17, upper_limit=0.4, step_size=0.01 &end
+!&optimization_variable name = lc11, item=L, lower_limit=0.17, upper_limit=1.1, step_size=0.01 &end
+!&optimization_variable name = lc21, item=L, lower_limit=0.17, upper_limit=0.7, step_size=0.01 &end
+!&optimization_variable name = lc31, item=L, lower_limit=0.17, upper_limit=0.7, step_size=0.01 &end
+!&optimization_variable name = lc4,  item=L, lower_limit=0.17, upper_limit=1.2, step_size=0.01 &end
+!&optimization_variable name = lq,   item=L, lower_limit=0.15, upper_limit=0.6, step_size=0.01 &end
+
+&optimization_covariable name = b2,   item=K1, equation = B1.K1 &end
+&optimization_covariable name = b3,   item=K1, equation = B1.K1 &end
+!&optimization_covariable name = lib, item=L, equation = "LIB.L0 LA11.L0 LA2.L0 LB32.L0 LB2.L0 LB11.L0 LC11.L0 2 * LC21.L0 2 * LC31.L0 2 * LC4.L0 2 * LQ.L0 8 * + + + + + + + + + + LA11.L LA2.L LB32.L LB2.L LB11.L LC11.L 2 * LC21.L 2 * LC31.L 2 * LC4.L 2 * LQ.L 8 * + + + + + + + + + -"   &end
+!&optimization_covariable name = lqh, item=L, equation = "LQ.L 2 /"   &end
+
+&bunched_beam &end
+&optimize &end
+&save_lattice filename = <lattice>.new &end
+
+&run_setup
+	lattice = <lattice>.new
+	p_central_mev = 3e3,
+	use_beamline = sup4c,
+	default_order = 2,
+    magnets = <lattice>.mag
+&end
+
+&twiss_output
+    radiation_integrals = 1
+	matched = 1,
+    filename = <lattice>.twi
+    concat_order = 2
+&end

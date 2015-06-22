@@ -1,0 +1,182 @@
+! ------------------- table of elements -------------------
+
+
+dia1     : drift, l = 1.000000
+dia2     : drift, l = 2.492900
+dib1     : drift, l = 1.000000
+dib2     : drift, l = 2.132900
+dbc      : drift, l = 0.013000
+db3      : drift, l = 0.108000
+d05      : drift, l = 0.050000
+d12      : drift, l = 0.120000
+d13      : drift, l = 0.130000
+d14      : drift, l = 0.140000
+d15      : drift, l = 0.150000
+d16      : drift, l = 0.160000
+d17      : drift, l = 0.170000
+d18      : drift, l = 0.180000
+d19      : drift, l = 0.190000
+d21      : drift, l = 0.210000
+d22      : drift, l = 0.220000
+d23      : drift, l = 0.230000
+d24      : drift, l = 0.240000
+d30      : drift, l = 0.300000
+d34      : drift, l = 0.340000
+d43      : drift, l = 0.430000
+d45      : drift, l = 0.450000
+d46      : drift, l = 0.460000
+d48      : drift, l = 0.480000
+d50      : drift, l = 0.500000
+d61      : drift, l = 0.610000
+d73      : drift, l = 0.730000
+dsd11    : drift, l = 0.610000 !0.61
+dsd12    : drift, l = 0.170000 !0.17
+dsd21    : drift, l = 0.170000 !0.17
+dsd22    : drift, l = 0.340000 !0.34
+dsd31    : drift, l = 0.460000 !0.46
+dsd32    : drift, l = 0.170000 !0.17
+
+
+mc       : marker, fitpoint=1
+mia      : marker, fitpoint=1
+mib      : marker, fitpoint=1
+qs       : marker
+ampivu   : MAXAMP,X_MAX=0.012,Y_MAX=0.0025
+ampovu   : MAXAMP,X_MAX=0.012,Y_MAX=0.0025
+ampvac   : MAXAMP,X_MAX=0.012,Y_MAX=0.012, ELLIPTICAL=1
+mclcacp  : marker
+crhv     : marker
+
+qfa    : kquad, l = 0.200000, k1 = 3.827827,n_kicks=20
+qda    : kquad, l = 0.140000, k1 =-1.785751,n_kicks=14
+qdb2   : kquad, l = 0.140000, k1 =-2.470898,n_kicks=14
+qfb    : kquad, l = 0.300000, k1 = 4.046085,n_kicks=30
+qdb1   : kquad, l = 0.140000, k1 =-2.618146,n_kicks=14
+qf1    : kquad, l = 0.200000, k1 = 2.961958,n_kicks=20
+qf2    : kquad, l = 0.200000, k1 = 4.237821,n_kicks=20
+qf3    : kquad, l = 0.200000, k1 = 3.298691,n_kicks=20
+qf4    : kquad, l = 0.200000, k1 = 3.883838,n_kicks=20
+qb3    : kquad, l = 0.050000, k1 = 0.000000,n_kicks=05
+
+
+b1e    : csbend, l = 0.414, angle = 0.024044528440100, k1 = -0.78, &
+         e1 = 0.012342095805478, e2 = 0.0, hgap = 0.000000, &
+         fint =0.0000, n_kicks=42
+b1s    : csbend, l = 0.414, angle = 0.024044528440100, k1 = -0.78, &
+         e1 = 0.0, e2 = 0.012342095805478, hgap = 0.000000, &
+         fint =0.0000, n_kicks=42
+b2e    : csbend, l = 0.410333, angle = 0.023831889, k1 = -0.78, &
+         e1 = 0.012342095805478, e2 = 0.0, hgap = 0.000000, &
+         fint =0.0000, n_kicks=42
+b2i    : csbend, l = 0.410333, angle = 0.023831889, k1 = -0.78, &
+         e1 = 0.0, e2 = 0.0, hgap = 0.000000, fint =0.0000, n_kicks=42
+b2s    : csbend, l = 0.410333, angle = 0.023831889, k1 = -0.78, &
+         e1 = 0.0, e2 = 0.012342095805478, hgap = 0.000000, &
+         fint =0.0000, n_kicks=42
+
+b3c1   : csbend, l = 0.015000, angle = 0.004869, k1 = -0.018500, &
+         e1 = 0.000000, e2 = 0.000000, hgap = 0.000000, fint =0.0000
+b3c2   : csbend, l = 0.005000, angle = 0.001571, k1 = -0.081000, &
+         e1 = 0.000000, e2 = 0.000000, hgap = 0.000000, fint =0.0000
+b3c3   : csbend, l = 0.005000, angle = 0.001361, k1 = -0.168000, &
+         e1 = 0.000000, e2 = 0.000000, hgap = 0.000000, fint =0.0000
+b3c4   : csbend, l = 0.005000, angle = 0.001030, k1 = -0.130000, &
+         e1 = 0.000000, e2 = 0.000000, hgap = 0.000000, fint =0.0000
+b3c5   : csbend, l = 0.010000, angle = 0.001484, k1 = -0.072000, &
+         e1 = 0.000000, e2 = 0.000000, hgap = 0.000000, fint =0.0000
+b3c6   : csbend, l = 0.010000, angle = 0.001030, k1 = -0.045000, &
+         e1 = 0.000000, e2 = 0.000000, hgap = 0.000000, fint =0.0000
+b3c7   : csbend, l = 0.015000, angle = 0.001117, k1 = -0.080000, &
+         e1 = 0.000000, e2 = 0.000000, hgap = 0.000000, fint =0.0000
+b3c8   : csbend, l = 0.020000, angle = 0.001274, k1 = -0.389000, &
+         e1 = 0.000000, e2 = 0.000000, hgap = 0.000000, fint =0.0000
+b3c9   : csbend, l = 0.325000, angle = 0.022166, k1 = -0.891000, &
+         e1 = 0.000000, e2 = 0.000000, hgap = 0.000000, fint =0.0000
+b3c10  : csbend, l = 0.010000, angle = 0.000541, k1 = -0.690500, &
+         e1 = 0.000000, e2 = 0.000000, hgap = 0.000000, fint =0.0000
+b3c11  : csbend, l = 0.010000, angle = 0.000384, k1 = -0.325000, &
+         e1 = 0.000000, e2 = 0.000000, hgap = 0.000000, fint =0.0000
+b3c12  : csbend, l = 0.010000, angle = 0.000262, k1 = -0.129000, &
+         e1 = 0.000000, e2 = 0.000000, hgap = 0.000000, fint =0.0000
+b3c13  : csbend, l = 0.020000, angle = 0.000407, k1 = 0.009000, &
+         e1 = 0.000000, e2 = 0.000000, hgap = 0.000000, fint =0.0000
+
+
+sda    : ksext, l = 0.075000, k2 =-314.337981,n_kicks=8
+sfa    : ksext, l = 0.075000, k2 = 259.708197,n_kicks=8
+sdb    : ksext, l = 0.075000, k2 =-197.440706,n_kicks=8
+sfb    : ksext, l = 0.075000, k2 = 234.609888,n_kicks=8
+sd1    : ksext, l = 0.075000, k2 =-355.887806,n_kicks=8
+sf1    : ksext, l = 0.075000, k2 = 470.004238,n_kicks=8
+sd2    : ksext, l = 0.075000, k2 =-257.544974,n_kicks=8
+sd3    : ksext, l = 0.075000, k2 =-134.091273,n_kicks=8
+sf2    : ksext, l = 0.075000, k2 =   2.100370,n_kicks=8
+sd6    : ksext, l = 0.075000, k2 =-433.583378,n_kicks=8
+sf4    : ksext, l = 0.075000, k2 = 571.342699,n_kicks=8
+sd5    : ksext, l = 0.075000, k2 =-231.715849,n_kicks=8
+sd4    : ksext, l = 0.075000, k2 =-205.510491,n_kicks=8
+sf3    : ksext, l = 0.075000, k2 = 220.547662,n_kicks=8
+
+mon     : moni
+ch      : hkick, kick = 0.0000
+cv      : vkick, kick = 0.0000
+
+! ------------------- table of segments -------------------
+b1       : line = (b1e, mclcacp, b1s)
+b2       : line = (b2e, mclcacp, b2i, mclcacp, b2s)
+b3bce    : line = (b3c13, b3c12, b3c11, b3c10, mclcacp, b3c9, b3c8, b3c7, &
+           b3c6, b3c5, b3c4, b3c3, b3c2, b3c1, mclcacp)
+b3bcs    : line = (b3c1, b3c2, b3c3, b3c4, b3c5, b3c6, b3c7, b3c8, &
+           b3c9, mclcacp, b3c10, b3c11, b3c12, b3c13)
+dispia   : line = (b1, d61, sd1, ch, cv, sd1, d17, qf1, d14, mon, &
+           d12, sf1, qs, sf1, d23, qf2, d17, sd2, ch, sd2, d21, mon, d13, &
+           b2, d46, sd3, cv, sd3, d17, qf3, d23, sf2, &
+           ch, sf2, d12, mon, d14, qf4, d17, crhv, d43, mon, d13, &
+           db3, qb3, b3bce)
+dispca   : line = (b3bcs, qb3, db3, d73, qf4, d14, mon, d12, sf2, &
+           ch, sf2, d23, qf3, d17, sd3, cv, sd3, d46, &
+           b2, d34, sd2, ch, sd2, d17, qf2, d23, sf1, qs, sf1, d12, &
+           mon, d14, qf1, d17, sd1, ch, cv, sd1, d48, mon, d13, &
+           b1)
+dispib   : line = (b1, d61, sd6, ch, cv, sd6, d17, qf1, d14, mon, &
+           d12, sf4, qs, sf4, d23, qf2, d17, sd5, ch, sd5, d21, mon, d13, &
+           b2, d46, sd4, cv, sd4, d17, qf3, d23, sf3, &
+           ch, sf3, d12, mon, d14, qf4, d17, crhv, d43, mon, d13, &
+           db3, qb3, b3bce)
+dispcb   : line = (b3bcs, qb3, db3, d73, qf4, d14, mon, d12, sf3, &
+           ch, sf3, d23, qf3, d17, sd4, cv, sd4, d46, &
+           b2, d34, sd5, ch, sd5, d17, qf2, d23, sf4, qs, sf4, d12, &
+           mon, d14, qf1, d17, sd6, ch, cv, sd6, d48, mon, d13, &
+           b1)
+insa     : line = (dia1, ampovu, ampvac, dia2, crhv, d16, sfa, &
+           ch, cv, sfa, d12, mon, d14, qfa, d15, sda, qs, sda, d23, &
+           qda, d17)
+insb     : line = (dib1, ampivu, ampvac, dib2, qdb2, d15, crhv, &
+           d16, sfb, ch, cv, sfb, d12, mon, d14, qfb, d15, sdb, &
+           qs, sdb, d15, qdb1, d22)
+hsupia   : line = (insa, mclcacp, dispia)
+hsupca   : line = (dispca, mclcacp, -insa)
+hsupib   : line = (insb, mclcacp, dispib)
+hsupcb   : line = (dispcb, mclcacp, -insb)
+supa     : line = (hsupia, hsupca)
+supb     : line = (hsupib, hsupcb)
+supab    : line = (hsupia, mc, mclcacp, hsupcb)
+supba    : line = (hsupib, mc, mclcacp, hsupca)
+anela    : line = (supa)
+anelb    : line = (supb)
+anelab   : line = (mia, supab, mib, supba)
+supca    : line = (hsupca,mia, hsupia)
+supcb    : line = (hsupcb,mib, hsupib)
+sup4c    : line = (mia,hsupia,mc,supcb,mc,supcb,mc,supcb,mc,hsupca)
+anel     : line = (5*sup4c)
+
+! ring with initial misalignment and watch point for centroid observation
+malin: malign,on_pass=0
+w1      : watch,filename="%s.w1",mode="centroid"
+anelw   : line=(malin,w1,anel)
+
+! ring with with rf cavity and radiation damping, but no quantum excitation
+! 5.320e-01 is the energy loss per turn
+rfc     : rfca, volt=3.0e6, freq="c_mks 5.18396e2 / 864 *", phase="180 5.320e-1 3.0 / dasin -"
+sr      : sreffects,qexcitation=0
+anelrf  : line=(anel, sr,rfc)
