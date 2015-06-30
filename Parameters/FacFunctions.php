@@ -98,15 +98,15 @@ function rf_energy_acceptance($q, $energy, $U0, $h, $alpha)
     return 100 * $energy_accpt;
 }
 
-function natural_emittance($gamma, $Jx, $I2, $I5)
+function natural_emittance($gamma, $I2, $I4, $I5)
 {
     /*
-     * Natural emittance [nm·rad] from ebeam gamma factor, damping partitio
-     * number Jx, I2[1/m] and I5 [1/m]
+     * Natural emittance [nm·rad] from ebeam gamma factor,
+     * I2[1/m], I4[1/m] and I5[1/m]
      */
     global $Cq;
 
-    $emitt = $Cq * $gamma*$gamma*$I5/($Jx*$I2) * 1e9;
+    $emitt = $Cq * $gamma*$gamma*$I5/($I2-$I4) * 1e9;
     return $emitt;
 }
 
