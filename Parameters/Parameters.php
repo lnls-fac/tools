@@ -161,6 +161,8 @@ function fac_dependencies_parameter_render($input, array $args,
         $output = implode(', ', $deps_with_links);
     } catch(FacException $e) {
         $output = fac_get_error_message('Error: ' . $e->getMessage());
+    } catch(Exception $e) {
+        $output = fac_get_error_message('Exception: ' . $e->getMessage());
     }
 
     return $parser->recursiveTagParse($output, $frame);
