@@ -10,8 +10,8 @@ def usage():
 
 def matchTune(lattice_old, lattice_new, nux, nuy):
 
-    path = ('/home/fac_files/data/sirius/si/beam_dynamics/calcs/' +
-           'v07/study.new.lattice/scripts/templates/')
+    path = '/'.join((os.path.dirname(os.path.realpath(__file__)),'templates',''))
+
     p = sub.getoutput('elegant '+path+'matchTune.ele -macro=tunex='+nux+',tuney=' +nuy+
                       ',lattice_old='+lattice_old+',lattice_new='+ lattice_new)
 

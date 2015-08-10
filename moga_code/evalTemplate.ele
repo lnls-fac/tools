@@ -8,17 +8,17 @@
 ! Track particles with variable initial momentum offset in order to find our where the
 ! integer and half-integer resonances get crossed
 &run_setup
-        lattice = <rootname>.new,
-        use_beamline = anelw,
-        p_central_mev = 3e3
-        default_order = 2
-	    final = %s.fin
-        semaphore_file = %s.done0
-        rootname = <rootname>
+    lattice = <rootname>.new,
+    use_beamline = anelcompw,
+    p_central_mev = 3e3
+    default_order = 2
+    final = %s.fin
+    semaphore_file = %s.done0
+    rootname = <rootname>
 &end
 &twiss_output
-	concat_order = 2
-	radiation_integrals = 1
+    concat_order = 2
+    radiation_integrals = 1
 &end
 
 &alter_elements name=MALIN, item=ON_PASS, value=0 &end
@@ -29,8 +29,8 @@
     closed_orbit_iterations = 500
 &end
 &run_control
-	n_passes = 128
-	n_indices = 1
+    n_passes = 128
+    n_indices = 1
 &end
 &vary_element
     name=MALIN,
@@ -48,7 +48,7 @@
 ! must not include vacuum chambers
 &run_setup
     lattice = <rootname>.new,
-    use_beamline = anelrf,
+    use_beamline = anelcomprf,
     p_central_mev = 3e3,
     default_order = 2,
     random_number_seed = 19041988,
@@ -56,20 +56,20 @@
     tracking_updates = 0
     parameters = %s.param2
 &end
-&alter_elements name = SFA, item = K2, value = 0.0 &end
-&alter_elements name = SDA, item = K2, value = 0.0 &end
-&alter_elements name = SFB, item = K2, value = 0.0 &end
-&alter_elements name = SDB, item = K2, value = 0.0 &end
-&alter_elements name = SD2, item = K2, value = 0.0 &end
-&alter_elements name = SD3, item = K2, value = 0.0 &end
-&alter_elements name = SF2, item = K2, value = 0.0 &end
-&alter_elements name = SD1, item = K2, value = 0.0 &end
-&alter_elements name = SF1, item = K2, value = 0.0 &end
-&alter_elements name = SD5, item = K2, value = 0.0 &end
-&alter_elements name = SD4, item = K2, value = 0.0 &end
-&alter_elements name = SF3, item = K2, value = 0.0 &end
-&alter_elements name = SD6, item = K2, value = 0.0 &end
-&alter_elements name = SF4, item = K2, value = 0.0 &end
+&alter_elements name = SDAM , item = K2, value = 0.0 &end
+&alter_elements name = SFAM , item = K2, value = 0.0 &end
+&alter_elements name = SDBM , item = K2, value = 0.0 &end
+&alter_elements name = SFBM , item = K2, value = 0.0 &end
+&alter_elements name = SD1JM, item = K2, value = 0.0 &end
+&alter_elements name = SF1JM, item = K2, value = 0.0 &end
+&alter_elements name = SD2JM, item = K2, value = 0.0 &end
+&alter_elements name = SD3JM, item = K2, value = 0.0 &end
+&alter_elements name = SF2JM, item = K2, value = 0.0 &end
+&alter_elements name = SD1KM, item = K2, value = 0.0 &end
+&alter_elements name = SF1KM, item = K2, value = 0.0 &end
+&alter_elements name = SD2KM, item = K2, value = 0.0 &end
+&alter_elements name = SD3KM, item = K2, value = 0.0 &end
+&alter_elements name = SF2KM, item = K2, value = 0.0 &end
 
 ! turn off vacuum chamber
 &alter_elements name = AMPIVU, item = X_MAX, value = 1 &end
@@ -80,7 +80,7 @@
 &alter_elements name = AMPVAC, item = Y_MAX, value = 1 &end
 
 &twiss_output
-	matched = 1 , radiation_integrals = 1
+    matched = 1 , radiation_integrals = 1
 &end
 &run_control
     n_steps = <nsteps>
@@ -99,7 +99,7 @@
 &error_element name = *, type = gaussian, cutoff = 1.0, element_type=KSEXT, item = TILT, bind = 0, amplitude = 2e-4 &end
 &error_element name = *, type = gaussian, cutoff = 1.0, element_type=CSBEND,item = ETILT, bind = 0, amplitude = 2e-4 &end
 &correct
-  	disable = 0,
+      disable = 0,
     mode = "orbit", method = "global",
     verbose = 1, n_iterations = 4, n_xy_cycles = 100,
     correction_fraction[0] = 0.5, 0.5,
@@ -109,7 +109,7 @@
     closed_orbit_iteration_fraction = 0.5
     closed_orbit_iterations = 500,
     closed_orbit_accuracy = 1e-9,
-  	keep_largest_SVs[0] = 0, 0
+      keep_largest_SVs[0] = 0, 0
 &end
 &bunched_beam &end
 &track &end
@@ -120,7 +120,7 @@
 
 &run_setup
     lattice = <rootname>.new,
-    use_beamline = anelrf,
+    use_beamline = anelcomprf,
     p_central_mev = 3e3,
     default_order = 2,
     rootname = <rootname>,
@@ -146,13 +146,13 @@
 &alter_elements name = AMPVAC, item = Y_MAX, value = 1 &end
 
 &twiss_output
-	matched = 1 , radiation_integrals = 1
+    matched = 1 , radiation_integrals = 1
 &end
 &run_control
     n_steps = <nsteps>
 &end
 &correct
-	disable = 0,
+    disable = 0,
     mode = "orbit", method = "global",
     verbose = 1, n_iterations = 4, n_xy_cycles = 100,
     correction_fraction[0] = 0.5, 0.5,
@@ -165,7 +165,7 @@
     closed_orbit_iterations = 500,
     closed_orbit_accuracy = 1e-9,
     prezero_correctors = 0,
-	keep_largest_SVs[0] = 0, 0
+    keep_largest_SVs[0] = 0, 0
 &end
 &bunched_beam &end
 &track &end
@@ -174,7 +174,7 @@
 ! track for dynamic aperture with radiation damping
 &run_setup
     lattice = <rootname>.new,
-    use_beamline = anelrf,
+    use_beamline = anelcomprf,
     p_central_mev = 3e3
     default_order = 2
     rootname = <rootname>
@@ -183,10 +183,10 @@
     random_number_seed = 0
 &end
 &twiss_output
-   output_at_each_step = 0
-   concat_order = 2
-   matched = 1
-   radiation_integrals = 1
+    output_at_each_step = 0
+    concat_order = 2
+    matched = 1
+    radiation_integrals = 1
 &end
 &load_parameters
     filename = %s.erl,
@@ -204,7 +204,7 @@
     radiation_integrals = 1
 &end
 &run_control
-	n_passes = <turns>
+    n_passes = <turns>
     n_steps = <nsteps>
 &end
 &closed_orbit
@@ -228,7 +228,7 @@
 ! We load the errors from the previous step
 &run_setup
     lattice = <rootname>.new,
-    use_beamline = anelrf,
+    use_beamline = anelcomprf,
     p_central_mev = 3e3
     default_order = 2
     semaphore_file = %s.done0
@@ -250,25 +250,25 @@
    radiation_integrals = 1
 &end
 &run_control
-	n_passes = <turns>
+    n_passes = <turns>
     n_steps = <nsteps>
 &end
 &momentum_aperture
-	output = %s.mmap,
-	x_initial = 1e-6,
-	y_initial = 1e-6,
-	delta_negative_start= -0.017
-	delta_negative_limit = -0.057,
-	delta_positive_start= 0.017
-	delta_positive_limit = 0.057,
-	delta_step_size = 0.005,
-	split_step_divisor = 3,
+    output = %s.mmap,
+    x_initial = 1e-6,
+    y_initial = 1e-6,
+    delta_negative_start= -0.017
+    delta_negative_limit = -0.057,
+    delta_positive_start= 0.017
+    delta_positive_limit = 0.057,
+    delta_step_size = 0.005,
+    split_step_divisor = 3,
     splits = 2,
     steps_back = 1,
-	s_start = 0,
-	s_end = 51.9,
-	include_name_pattern = MCLCACP,
-	fiducialize = 0,
-	verbosity = 1,
-	soft_failure = 1
+    s_start = 0,
+    s_end = 51.9,
+    include_name_pattern = MOMACCEP,
+    fiducialize = 0,
+    verbosity = 1,
+    soft_failure = 1
 &end

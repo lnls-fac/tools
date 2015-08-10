@@ -7,8 +7,8 @@ def usage():
     print('old_lattice must have the extension and new_lattice must not.')
 
 def matchNonLinear(lattice_old, lattice_new):
-    path = ('/home/fac_files/data/sirius/si/beam_dynamics/calcs/' +
-            'v07/study.new.lattice/scripts/templates/')
+    path = '/'.join((os.path.dirname(os.path.realpath(__file__)),'templates',''))
+    
     p = sub.getoutput('elegant '+path+'matchNonLinear.ele -macro='+
                       'lattice_old=' + lattice_old +
                       ',lattice_new=' + lattice_new)

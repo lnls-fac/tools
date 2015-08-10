@@ -41,14 +41,18 @@ set nomes []
 for {set ii 1} {$ii <= $nsteps} {incr ii} {
     set i [format "%03d" $ii]
     # para evitar loops infinitos do touschekLifetime quando a máquina for instável
-    exec sddsprocess ${rootname}$i.mmap1 -pipe=out "-redefine=col,deltaPositive,deltaPositive 0.001 < ? 0.001 : deltaPositive $ ,units=m" \
-       | sddsprocess -pipe=in ${rootname}$i.mmap1  "-redefine=col,deltaNegative,deltaNegative -0.001 > ? -0.001 : deltaNegative $ ,units=m"
+    exec sddsprocess ${rootname}$i.mmap1 -pipe=out \
+        "-redefine=col,deltaPositive,deltaPositive 0.001 < ? 0.001 : deltaPositive $ ,units=m" \
+        | sddsprocess -pipe=in ${rootname}$i.mmap1 \
+        "-redefine=col,deltaNegative,deltaNegative -0.001 > ? -0.001 : deltaNegative $ ,units=m"
     #
     exec sddssort ${rootname}$i.mmap1 -pipe=out -column=s,decreasing \
-    | sddsprocess -pipe=in ${rootname}$i.mmap2 "-redefine=col,s,$lsector s -"
+        | sddsprocess -pipe=in ${rootname}$i.mmap2 \
+        "-redefine=col,s,$lsector s -"
     exec sddscombine ${rootname}$i.mmap1 ${rootname}$i.mmap2 ${rootname}$i.mmap -merge
 
-    set sMax [exec sddsprocess ${rootname}$i.mmap -pipe=out -process=s,max,sMax | sdds2stream -pipe -page=1 -parameter=sMax]
+    set sMax [exec sddsprocess ${rootname}$i.mmap -pipe=out \
+        -process=s,max,sMax | sdds2stream -pipe -page=1 -parameter=sMax]
     set msectors [expr int($sMax/$lsector+0.5)]
     set number [expr int((1.0*$sectors)/$msectors+0.5)]
 

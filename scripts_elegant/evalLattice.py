@@ -23,8 +23,7 @@ def evalLatt(lattice, nturns=1000,nsteps=20, nproc =1):
     os.chdir(rootname)
     sh.copyfile('../' + lattice, lattice)
 
-    path = ('/home/fac_files/data/sirius/si/beam_dynamics/calcs/' +
-           'v07/study.new.lattice/scripts/templates/')
+    path = '/'.join((os.path.dirname(os.path.realpath(__file__)),'templates',''))
 
     steps_per_proc = int(math.modf(nsteps/nproc)[1])
     left_steps = nsteps - nproc*steps_per_proc

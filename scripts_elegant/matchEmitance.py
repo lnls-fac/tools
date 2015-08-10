@@ -4,8 +4,7 @@ import subprocess as sub
 
 lattice_name=sub.sys.argv[1]
 
-path = ('/home/fac_files/data/sirius/si/beam_dynamics/calcs/' +
-        'v07/study.new.lattice/scripts/templates/')
+path = '/'.join((os.path.dirname(os.path.realpath(__file__)),'templates',''))
 
 p = sub.getoutput('elegant '+path+'matchEmittance.ele -macro=lattice=' + lattice_name)
 

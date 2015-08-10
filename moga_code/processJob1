@@ -27,7 +27,7 @@ set deltaLimit 6.0e-2
 set args $argv
 if {[APSStrictParseArguments {oldDir rootname typeStat xchrom ychrom\
                         coupling current bunches sigmas deltaLimit}] || \
-	![string length $rootname] } {
+    ![string length $rootname] } {
     return -code error "$usage"
 }
 
@@ -69,17 +69,19 @@ proc waitForFiles {args} {
     set ok 0
     set tries 5
     while {!$ok && $tries} {
-	set ok 1
+        set ok 1
         set notFoundList ""
-	foreach exten $extensionList {
-	    if [string compare "ok" [exec sddscheck $rootname.$exten]]!=0 {
+        foreach exten $extensionList {
+            if [string compare "ok" [exec sddscheck $rootname.$exten]]!=0
+                {
                 lappend notFoundList $rootname.$exten
                 set ok 0
-            }
-	}
-	if !$ok {
-            after 5000
-            incr tries -1
+                }
+        }
+    if !$ok
+        {
+        after 5000
+        incr tries -1
         }
     }
     return $ok
@@ -106,10 +108,10 @@ if {[file exists $rootname.w1] && [file exists $rootname.fin]} {
     # First, look for cases where the particle is lost and find the minimum
     # |delta|
     if [catch {exec sddsprocess $rootname.finc -pipe=out -nowarning \
-                 "-define=col,deltaAbs,MALIN.DP abs" \
-                 -filter=column,Transmission,1,1,! \
-                 -process=deltaAbs,min,%sMin \
-                 | sdds2stream -pipe -parameter=deltaAbsMin} result] {
+              "-define=col,deltaAbs,MALIN.DP abs" \
+              -filter=column,Transmission,1,1,! \
+              -process=deltaAbs,min,%sMin \
+              | sdds2stream -pipe -parameter=deltaAbsMin} result] {
         failAndExit "delta limit 1: $result"
     }
     puts $fd "Delta limit 1 : $result"
@@ -119,18 +121,20 @@ if {[file exists $rootname.w1] && [file exists $rootname.fin]} {
 
     # Second, look for undefined tunes
     if [catch {exec sddsnaff $rootname.w1 -pipe=out \
-                 -column=Pass -pair=Cx,Cxp -pair=Cy,Cyp -terminate=frequencies=1 \
-                 | sddscombine -pipe -merge \
-                 | sddsxref -pipe $rootname.finc -take=MALIN.DP \
-                 | sddsprocess -pipe "-define=column,deltaAbs,MALIN.DP abs" \
-	         -filter=col,deltaAbs,1e-3,1 \
-                 | sddssort -pipe -column=deltaAbs \
-                 | sddsprocess -nowarning -pipe=in $rootname.naff -process=C*Frequency,first,%s0 } result] {
+              -column=Pass -pair=Cx,Cxp -pair=Cy,Cyp -terminate=frequencies=1 \
+              | sddscombine -pipe -merge \
+              | sddsxref -pipe $rootname.finc -take=MALIN.DP \
+              | sddsprocess -pipe "-define=column,deltaAbs,MALIN.DP abs" \
+              -filter=col,deltaAbs,1e-3,1 \
+              | sddssort -pipe -column=deltaAbs \
+              | sddsprocess -nowarning -pipe=in $rootname.naff \
+              -process=C*Frequency,first,%s0 } result] {
         failAndExit "delta limit 2: $result"
     }
-    if [catch {exec sddsprocess -nowarning $rootname.naff -pipe=out -filter=col,CxFrequency,-1,-1,CyFrequency,-1,-1,|  \
-                 -process=deltaAbs,min,%sMin \
-             | sdds2stream -pipe -parameter=deltaAbsMin} result] {
+    if [catch {exec sddsprocess -nowarning $rootname.naff -pipe=out \
+              -filter=col,CxFrequency,-1,-1,CyFrequency,-1,-1,|  \
+              -process=deltaAbs,min,%sMin \
+              | sdds2stream -pipe -parameter=deltaAbsMin} result] {
         failAndExit "delta limit 2: $result"
     }
     puts $fd "Delta limit 2: $result"
@@ -141,14 +145,14 @@ if {[file exists $rootname.w1] && [file exists $rootname.fin]} {
     # Look for integer or half-integer crossings
     foreach plane {x y} {
         if [catch {exec sddsprocess $rootname.naff -pipe=out -nowarning \
-                     "-define=column,badTune,C${plane}Frequency 2 * int C${plane}Frequency0 2 * int - abs" \
-                     -filter=col,badTune,1,1 \
-                     -process=deltaAbs,min,%sMin \
-                     | sdds2stream -pipe -parameter=deltaAbsMin} result] {
+                   "-define=column,badTune,C${plane}Frequency 2 * int C${plane}Frequency0 2 * int - abs" \
+                   -filter=col,badTune,1,1 \
+                   -process=deltaAbs,min,%sMin \
+                   | sdds2stream -pipe -parameter=deltaAbsMin} result] {
             failAndExit "delta limit 3 ($plane): $result"
         }
         puts $fd "Delta limit 3 ($plane): $result"
-		if {![string match *e+308 $result] && [expr $result<$deltaLimit]} {
+        if {![string match *e+308 $result] && [expr $result<$deltaLimit]} {
             set deltaLimit $result
         }
     }
@@ -170,7 +174,7 @@ puts $fd "Lifetime done"
 # ChromPenalty, DAPenalty, and LTPenalty for chromaticity, DA, and lifetime
 
 # The processing of the .aper file uses the clipped DA boundary (yClipped
-# and xClipped).  The xClipped data is further limited to <10mm, because at
+# and xClipped).  The xClipped data is further limited to <12mm, because at
 # APS we inject on the negative side and don't care about positive DA beyond
 # that.
 
@@ -183,12 +187,12 @@ if [catch {exec sddsprocess $rootname.mmap -pipe=out \
          | sddsprocess -pipe -process=tLifetime,$typeStat,tLifetime \
          | sddscollapse -pipe=in $rootname.ltimec
     exec sddsprocess $rootname.aper -pipe=out \
-	     "-define=column,xClipped1,xClipped 0.01 > ? 0.01 : xClipped $ ,units=m" \
-	     -process=yClipped,integral,Area1parcial,functionOf=xClipped1 \
+         "-define=column,xClipped1,xClipped 0.012 > ? 0.012 : xClipped $ ,units=m" \
+         -process=yClipped,integral,Area1parcial,functionOf=xClipped1 \
              | sddscollapse -pipe \
              | sddsprocess -pipe -process=Area1parcial,$typeStat,Area1 \
              | sddscollapse -pipe \
-	     | sddsxref $rootname.ltimec -pipe -take=* \
+         | sddsxref $rootname.ltimec -pipe -take=* \
              | sddsxref $rootname.inp -pipe -take=* \
              | sddsxref $rootname.mmapc -pipe -take=* -nowarning \
              | sddsxref $rootname.twic -pipe -take=* \
@@ -196,7 +200,7 @@ if [catch {exec sddsprocess $rootname.mmap -pipe=out \
              "-redefine=column,deltaLimitLT,$deltaLimit" \
              "-reprint=column,runName,$rootname" \
              "-redefine=column,runID,$runID,type=long" \
-	     "-redefine=column,Time,[clock seconds],units=s,type=long" \
+         "-redefine=column,Time,[clock seconds],units=s,type=long" \
              "-redefine=column,ChromPenalty,dnux/dp $xchrom .01 sene  dnuy/dp $ychrom .01 sene +" \
              "-redefine=column,DAPenalty,Area1 chs" \
              "-redefine=column,LTPenalty,tLifetime chs" } result] {

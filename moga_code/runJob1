@@ -18,8 +18,8 @@ set tagList ""
 set rootname ""
 set args $argv
 if {[APSStrictParseArguments {valueList tagList rootname}] || \
-	![string length $valueList] || \
-	![string length $tagList] || ![string length $rootname] } {
+    ![string length $valueList] || \
+    ![string length $tagList] || ![string length $rootname] } {
     return -code error "$usage"
 }
 #puts stderr $rootname
@@ -31,10 +31,10 @@ if [llength $valueList]!=[llength $tagList] {
 
 # Optimization Parameters
 set turns 1000
-set xchrom 3.0
-set ychrom 3.0
-set nsteps 3
-set lattice "SI_x01_s52Tune.lte"
+set xchrom 2.5
+set ychrom 2.5
+set nsteps 2
+set lattice "si_v10_c01.lte"
 set typeStat "minimum"
 set coupling .01
 set current 100.0
@@ -65,7 +65,8 @@ if ![info exists env(TMPDIR)] {
 puts -nonewline $fd "Copying files: "
 flush $fd
 foreach file [list matchTemplate.ele $rootname.inp computeLifetime \
-              evalTemplate.ele computeLifetime processJob1 $lattice] {
+              evalTemplate.ele computeLifetime processJob1 $lattice \
+              sabia_kicktable.sdds] {
     exec cp $file $env(TMPDIR)/$file
 }
 puts $fd "done"
@@ -83,23 +84,23 @@ puts $fd "running elegant for chromaticity, DA, LMA"
 puts $fd "Check $oldDir/$rootname-main.log for status"
 flush $fd
 catch {exec elegant evalTemplate.ele -macro=[join $macroList ,] \
-		>& $oldDir/$rootname-main.log} result
+       >& $oldDir/$rootname-main.log} result
 puts $fd "tracking: $result"
 flush $fd
 
 if [file exists $rootname.done0] {
     set failed 0
     catch {exec processJob1 -rootname $rootname -oldDir $oldDir \
-	      -xchrom $xchrom -ychrom $ychrom -typeStat $typeStat \
+          -xchrom $xchrom -ychrom $ychrom -typeStat $typeStat \
           -coupling $coupling -current $current -bunches $bunches \
           -sigmas $sigmas -deltaLimit $deltaLimit}  result
     if ![file exists $rootname.proc] {
- 	puts $fd "processing failed: $result"
-	flush $fd
-	mkdir -p "$oldDir/errorLog/"
-	foreach file [glob -nocomplain ${rootname}*] {
-	    file copy -force $file $oldDir/errorLog/$file
-	}
+    puts $fd "processing failed: $result"
+    flush $fd
+    mkdir -p "$oldDir/errorLog/"
+    foreach file [glob -nocomplain ${rootname}*] {
+        file copy -force $file $oldDir/errorLog/$file
+    }
     }
 }
 
@@ -108,9 +109,9 @@ puts $fd "[glob -nocomplain ${rootname}*]"
 # Copy files back to the main directory
 foreach exten {.twi .proc .aper .mmap .w1 .naff .fin .new .orb .erl .cor2} {
     if [catch {file copy -force ./$rootname$exten $oldDir/$rootname$exten} result] {
-	puts $fd "** Problem copying ./$rootname$exten to $oldDir/$rootname$exten: $result"
+    puts $fd "** Problem copying ./$rootname$exten to $oldDir/$rootname$exten: $result"
     } else {
-	puts $fd "Copied ./$rootname$exten to $oldDir/$rootname$exten"
+    puts $fd "Copied ./$rootname$exten to $oldDir/$rootname$exten"
     }
 }
 close $fd

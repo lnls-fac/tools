@@ -1,6 +1,6 @@
-#!/bin/bash 
+#!/bin/bash
 
-if [ "$1" = "" ] ; then 
+if [ "$1" = "" ] ; then
     echo "usage: checkStatus <rootname>"
     exit 1
 fi
@@ -21,13 +21,13 @@ echo "queued: `qstat | fgrep $USER | fgrep -i \" qw \" | wc -l`"
 if [ -e $1.best ] ; then
     echo ""
 
-    sddsprintout -col=runID -col=tLifetime -col=Area1 -col=ChromPenalty -col=nu? -col=dnu??dp -col=ex0 $1.best -width=180 
+    sddsprintout -col=runID -col=tLifetime -col=Area1 -col=ChromPenalty -col=nu? -col=dnu??dp -col=ex0 $1.best -width=180
 
     sddsplot -layout=1,2 \
-	-col=Time,Rank $1.sort -ticks=xtime -graph=sym \
-	-col=Time,Rank $1.sort -ticks=xtime -filter=col,Rank,1,1 -graph=sym,thick=2,subtype=2 \
-	-col=Time,Rank $1.sort -ticks=xtime -filter=col,runID,0,0 -graph=sym,subtype=1,thick=2 -end \
-	-col=Area1,tLifetime $1.all -graph=sym \
-	-col=Area1,tLifetime $1.best -graph=sym,thick=2,subtype=2 -topline="`date`" -pointLabel=runName,edit="2Z-2Z0x/0/i/ /",scale=0.75 \
-	-col=Area1,tLifetime $1.all -graph=sym,subtype=1,thick=2 -filter=col,runID,0,0
+    -col=Time,Rank $1.sort -ticks=xtime -graph=sym \
+    -col=Time,Rank $1.sort -ticks=xtime -filter=col,Rank,1,1 -graph=sym,thick=2,subtype=2 \
+    -col=Time,Rank $1.sort -ticks=xtime -filter=col,runID,0,0 -graph=sym,subtype=1,thick=2 -end \
+    -col=Area1,tLifetime $1.all -graph=sym \
+    -col=Area1,tLifetime $1.best -graph=sym,thick=2,subtype=2 -topline="`date`" -pointLabel=runName,edit="2Z-2Z0x/0/i/ /",scale=0.75 \
+    -col=Area1,tLifetime $1.all -graph=sym,subtype=1,thick=2 -filter=col,runID,0,0
 fi

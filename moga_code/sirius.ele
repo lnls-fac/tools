@@ -1,6 +1,6 @@
 &run_setup
-	lattice = SI_x01_s52.lte
-    use_beamline = sup4c
+	lattice = si_v10_c01.lte
+    use_beamline = anelcomp
 	p_central_mev = 3e3
 	default_order = 2
 	magnets = %s.mag
@@ -9,4 +9,37 @@
 &twiss_output
 	filename = %s.twi
 	radiation_integrals = 1
+&end
+
+&run_setup
+    lattice = si_v10_c01.lte,
+    use_beamline = anelcomprf,
+    p_central_mev = 3e3
+    default_order = 2
+    random_number_seed = 0
+&end
+&twiss_output
+    output_at_each_step = 0
+    concat_order = 2
+    matched = 1
+    radiation_integrals = 1
+&end
+&run_control
+    n_passes = 1000
+    n_steps = 1
+&end
+&closed_orbit
+    output  = %s.cod
+    iteration_fraction = 0.1
+    closed_orbit_iterations = 500
+&end
+&find_aperture
+    output = %s.aper
+    mode = "n-line",
+    n_lines = 11,
+    xmax = 0.014
+    ymax = 0.004
+    nx = 17
+    n_splits = 2,
+    verbosity = 1,
 &end
