@@ -1,0 +1,59 @@
+#!/bin/sh  
+# \
+exec oagtclsh "$0" "$@"
+
+set auto_path [linsert $auto_path 0  $env(OAG_TOP_DIR)/oag/apps/lib/$env(HOST_ARCH)]
+set auto_path [linsert $auto_path 0 $env(OAG_TOP_DIR)/oag/lib_patch/$env(HOST_ARCH)]
+APSStandardSetup
+
+set usage {usage: log2input -old <rootname> -new <rootname> [-pick <runID>]}
+set old ""
+set new ""
+set pick ""
+set args $argv
+if {[APSStrictParseArguments {old new pick}] || ![string length $old] || \
+	![string length $new]} {
+    return -code error "$usage"
+}
+if ![file exists $old.sdds] {
+    return -code error "not found: $old.sdds"
+}
+if ![file exists $old.all] { 
+    return -code error "not found: $old.all"
+}
+if [file exists $new.sdds] {
+    return -code error "in use: $new.sdds"
+}
+
+# In case there are leading zeros
+scan $pick %d pick
+
+set parameterNameList [APSGetSDDSColumn -fileName $old.sdds -column parameterName]
+exec sddsconvert $old.sdds $new.sdds1 -delete=column,initialValue
+if [string length $pick] {
+    exec sddsprocess $old.sort -pipe=out \
+	-filter=column,runID,$pick,$pick \
+	| tee $old.best1 \
+	| sddsconvert -pipe -retain=column,[join $parameterNameList ,] \
+	| sddstranspose -pipe \
+	| sddsconvert -pipe -rename=column,Column=initialValue \
+	| sddsxref -pipe $new.sdds1 -match=OldColumnNames=parameterName -take=*  -transfer=parameter,* \
+	| sddsconvert -pipe=in $new.sdds -delete=column,OldColumnNames
+} else {
+    exec sddsprocess $old.sort -pipe=out \
+	-filter=col,Rank,1,1 \
+	-process=*Penalty,median,%sMax \
+	"-define=column,%sNorm,%s %sMax abs 1e-20 + /,select=*Penalty" \
+	| sddsrowstats -pipe -sum=penaltyValue,power=2,*PenaltyNorm \
+	| sddssort -pipe -column=penaltyValue,incr \
+	| sddsprocess -pipe -clip=1,0,invert \
+	| tee $old.best1 \
+	| sddsconvert -pipe -retain=column,[join $parameterNameList ,] \
+	| sddstranspose -pipe \
+	| sddsconvert -pipe -rename=column,Column=initialValue \
+	| sddsxref -pipe $new.sdds1 -match=OldColumnNames=parameterName -take=*  -transfer=parameter,* \
+	| sddsconvert -pipe=in $new.sdds -delete=column,OldColumnNames
+}
+
+file delete $new.sdds1
+

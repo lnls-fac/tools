@@ -1,0 +1,837 @@
+#!/bin/sh
+# \
+exec oagtclsh "$0" "$@"
+
+#
+# $Log: not supported by cvs2svn $
+# Revision 1.50  2011/04/20 23:32:26  borland
+# Now checks validity of .inp files.
+#
+# Revision 1.49  2011/02/15 14:01:55  borland
+# Fixed problem with using too many parents in some caes.
+#
+# Revision 1.48  2010/07/29 20:51:19  borland
+# Improve status printouts to use fewer lines.
+#
+# Revision 1.47  2010/07/28 16:15:02  borland
+# Merged in changes from BlueGene.  Supports an external job preparation and submission script.
+#
+# Revision 1.46  2010/02/22 15:07:21  borland
+# Improved function of updateOnly mode.
+#
+# Revision 1.45  2010/02/10 15:58:35  borland
+# Improved usage message.
+#
+# Revision 1.44  2010/02/10 15:57:00  borland
+# Added topUp, maxRank, drain, and updateOnly options.  Also, now sources geneticOptimizer.local file, which allows replacing the job submission routine (for example), which might be useful on different platforms.
+#
+# Revision 1.43  2010/01/19 19:50:22  borland
+# Disable history saving by the csh job scripts.
+#
+# Revision 1.42  2009/12/17 00:19:32  borland
+# Added maxRank commandline option.
+#
+# Revision 1.41  2009/12/15 16:37:11  borland
+# Added staggered submission and "top-up" function.
+# Removed use of .sub files; use .csh files instead since we have to have them
+# in any case.
+#
+# Revision 1.40  2009/12/14 18:43:41  borland
+# Improved behavior for processing problems.
+#
+# Revision 1.39  2009/12/04 19:20:13  borland
+# Fixed problem with processing on the head node.
+#
+# Revision 1.38  2009/08/24 15:52:22  shang
+# added checking if the input initial values are within the range defined by the lower and upper limit
+#
+# Revision 1.37  2009/03/25 13:20:20  borland
+# Checks for existance of .all file before running in non-continuation mode.
+#
+# Revision 1.36  2009/03/12 16:31:08  shang
+# fixed a problem in RemoveLosers so that it won't return errors and does not print message to stderr otherwise, the optimizer will delete all .proc files.
+#
+# Revision 1.35  2009/03/03 20:09:40  borland
+# RemoveLosers now removes <rootname>-*.* in addition to <rootname>.*
+#
+# Revision 1.34  2008/11/26 03:45:29  borland
+# Improved filtering out of NAN and INF results.
+#
+# Revision 1.33  2008/09/23 18:16:36  borland
+# Can now continue from previous session even if the .all file doesn't exist.
+#
+# Revision 1.32  2008/09/16 19:08:27  borland
+# Improved code for determining number of previously-started jobs in continuation
+# runs.
+#
+# Revision 1.31  2008/06/04 22:11:31  shang
+# Replace executable "replace" with "replaceText", since it conflicts with the new linux and solaris utilities.
+#
+# Revision 1.30  2008/02/18 22:37:29  shang
+# added catch statement to "eval file delete -force [glob $rootname-??????.proc]" so that it will not crash if no *.proc exists
+#
+# Revision 1.29  2007/11/26 18:38:24  borland
+# Improved handling of postprocessing.  Postprocessing script is now
+# optional, which is needed if the run script does the postprocessing.
+#
+# Revision 1.28  2007/08/03 20:43:24  shang
+# now optimizer can continue if there is at least one processed job.
+#
+# Revision 1.27  2007/07/25 17:30:33  shang
+# replaced shang's private sddssort by official version.
+#
+# Revision 1.26  2007/07/25 14:58:14  shang
+# added multiObjective option to run multi objective optimization.
+#
+# Revision 1.25  2005/06/20 16:53:15  borland
+# Fixed problems with running too many jobs when the queue gets full.
+#
+# Revision 1.24  2005/06/13 19:57:19  borland
+# Improved restart behavior when no jobs have been processed.
+#
+# Revision 1.23  2005/06/10 23:15:40  borland
+# Added new breeding method that combines just two parents at a time.
+#
+# Revision 1.22  2005/06/10 21:28:40  borland
+# Fixed bug that prevented running non-continuation mode.
+#
+# Revision 1.21  2005/06/10 18:17:18  borland
+# Improved the continuation feature.  Uses the .all file to determine how many
+# jobs have been run.  Also, the .all file no longer contains replicated data.
+#
+# Revision 1.20  2005/06/10 13:24:35  borland
+# No longer reports (incorrectly) that values outside the limits of the
+# variable are being used.
+#
+# Revision 1.19  2005/03/22 04:11:07  borland
+# More tolerant of processing errors.
+#
+# Revision 1.17  2003/11/04 16:13:18  borland
+# Fixed another bug in execution of setup script (called from another
+# location).  Was putting the rootname in the value list without putting
+# the corresponding tag in the tag list.
+#
+# Revision 1.16  2003/11/04 15:49:20  borland
+# Fixed bug in execution of setup script.  Was putting the rootname in the value
+# list without putting the corresponding tag in the tag list.
+#
+# Revision 1.15  2002/04/19 22:16:40  borland
+# Fixed problem with help printout.
+#
+# Revision 1.14  2002/04/11 23:30:32  borland
+# Fixed a minor bug in computing the number of jobs started.
+#
+# Revision 1.13  2002/04/10 18:31:16  borland
+# Fixed a bug in processing procedure when no processing was
+# completed.
+# Added some delays to allow jobs to start.
+#
+# Revision 1.12  2002/04/10 18:14:21  borland
+# Added optional script for running the simulation, instead of
+# just a program.  The script has the same option syntax as
+# the preProcessingScript.
+#
+# Revision 1.11  2002/04/10 03:54:51  borland
+# Now starts new jobs as soon as enough new parents are available.
+#
+# Revision 1.10  2002/04/09 14:13:38  borland
+# Added clock to loop output.
+#
+# Revision 1.9  2002/04/08 17:04:49  borland
+# Added to help message more information about the postprocessing script.
+#
+# Revision 1.8  2002/04/06 14:18:45  borland
+# Now substitutes the <rootname> field with the run name in the template file.
+#
+# Revision 1.7  2002/04/05 19:49:44  borland
+# Added option for preprocessing script.
+#
+# Revision 1.6  2002/04/04 20:02:30  borland
+# Keeps track of temporary files for job scripts and cleans them up.
+#
+# Revision 1.5  2002/04/04 15:05:01  borland
+# Added to the help message.
+#
+# Revision 1.4  2002/04/04 15:03:15  borland
+# Added help message.
+#
+# Revision 1.3  2002/04/04 03:36:47  borland
+# More improvements to job control.
+#
+# Revision 1.2  2002/04/03 23:50:07  borland
+# Improved job management.
+#
+# Revision 1.1  2002/04/03 17:25:02  borland
+# First version.
+#
+#
+
+if ![info exists env(OAG_TOP_DIR)] {
+    set env(OAG_TOP_DIR) /usr/local
+}
+set auto_path [linsert $auto_path 0  $env(OAG_TOP_DIR)/oag/apps/lib/$env(HOST_ARCH)]
+set auto_path [linsert $auto_path 0  $env(OAG_TOP_DIR)/../lib64/sdds]
+set auto_path [linsert $auto_path 0  $env(OAG_TOP_DIR)/../lib64/os]
+
+APSStandardSetup
+
+set usage {usage: genOpt -input <filename> [-contin 1] [-errorFactor <number>] [-reduce 1] [-help 1] [-multiObjective <1|0>] [-topUp 1] [-maxRank <integer>] [-drain 1] [-updateOnly 1]}
+
+proc PrintHelp {} {
+    global usage
+    puts stdout "$usage\n"
+    puts stdout "Description of commandline parameters:"
+    puts stdout "input:  name of the input file, as described above."
+    puts stdout "contin: if non-zero, then continue optimizing from a previous run"
+    puts stdout "errorFactor: factor by which to multiply the errorLevels from the input"
+    puts stdout "  file.  "
+    puts stdout "reduce: if non-zero, then trial jobs that are not selected for breeding"
+    puts stdout "  are deleted.  This saves time and disk space."
+    puts stdout "multiObjective: if non-zeron, then perform multiobjective optimization."
+    puts stdout "   The post-processing file *.proc should contain penalty value columns"
+    puts stdout "   one for each object, ending with the string \"Penalty\".  It may or"
+    puts stdout "   may not contain ConstraintViolation (short) columns."
+    puts stdout "topUp: if non-zero, then for continued runs the optimizer will start a sufficient number of jobs to ensure that"
+    puts stdout "   the desired total number is running.  Use this only if you have changed you input file in the middle of"
+    puts stdout "   running to increase the number of jobs and want to add jobs now, rather than waiting for processing to occur."
+    puts stdout "maxRank: for multiobjective mode, maximum rank of solutions to include in breeding. Default is 1."
+    puts stdout "drain: script waits for jobs to complete and updates output files, but doesn't submit new jobs."
+    puts stdout "updateOnly: script updates output files and then exits."
+    puts stdout ""
+    puts stdout "Description of input file:"
+    puts stdout "Parameters: "
+    puts stdout "nTotalJobs:  maximum number of jobs to run"
+    puts stdout "nParents:    number of parent jobs to use for breeding."
+    puts stdout "childMultiplier: number of child jobs to create per parent"
+    puts stdout "    NB: childMultiplier*nParents gives the number of simultaneous"
+    puts stdout "    jobs that will be run on the queue."
+    puts stdout "    For multi-objective mode, only this product is important."
+    puts stdout "maxRank: overrides maxRank parameter on the commandline."
+    puts stdout "sleepTime:   seconds to sleep between checking for newly-completed jobs"
+    puts stdout "staggerTime:  seconds to sleep between submission of successive jobs,"
+    puts stdout "    which can help reduce peak load on the system."
+    puts stdout "multiObjective: if non-zero, perform multiobjective optmization.  See above for"
+    puts stdout "    requirements.  Over-rides any commandline value."
+    puts stdout "preProcessingScript: script to run prior to running the job. (May be blank.)"
+    puts stdout "  The script must accept the following arguments and syntax: "
+    puts stdout "    -rootname <string>       rootname for the job."
+    puts stdout "    -tagList <string>        list of tags for varied quantities."
+    puts stdout "    -valueList <string>      list of values associated with tags."
+    puts stdout "    The tag names are the same as the parameter names given in the"
+    puts stdout "    parameterName column (see below)."
+    puts stdout "  E.g., the script will be called with arguments like these:"
+    puts stdout "    -rootname run-000000 -tagList \"Var1 Var2\" -valueList \"1.7 -2.8\""
+    puts stdout "postProcessingScript: script to run to postprocess a job.  Called with"
+    puts stdout "  one argument giving the rootname of the job.  This script must produce"
+    puts stdout "  a one-row SDDS file named <rootname>.proc that contains at least the "
+    puts stdout "  following columns:"
+    puts stdout "  runName --- the rootname of the run for this file"
+    puts stdout "  penaltyValue --- the value of the penalty function"
+    puts stdout "  This file must also have all the columns from <rootname>.inp sddsxref'd in."
+    puts stdout "runScript: script to run the simulation job.  The script must accept the"
+    puts stdout "  same arguments as the preProcessingScript.  If this is blank, then you"
+    puts stdout "  must give inputFileTemplate, inputFileExtension, and programName."
+    puts stdout "  The script must create a file <rootname>.run as soon as it starts"
+    puts stdout "  and <rootname>.done just before finishing."
+    puts stdout "inputFileTemplate: name of the template file for creating input files."
+    puts stdout "  Sequences of the form <name> are substituted with values."
+    puts stdout "inputFileExtension: extension to use for input files."
+    puts stdout "programName: name of the program to run with the input files.  The"
+    puts stdout "  input filename is given as the sole argument of the program."
+    puts stdout ""
+    puts stdout "Columns:"
+    puts stdout "parameterName: names of the parameters to vary in the optimization."
+    puts stdout "  These should appear in the input file template in the form <name>."
+    puts stdout "initialValue: initial values of the parameters"
+    puts stdout "errorLevel: rms width of the gaussian random errors to add to the"
+    puts stdout "  parameter values as mutations."
+    puts stdout "lowerLimit: smallest allowable values for the parameters"
+    puts stdout "upperLimit: largest allowable values for the parameters."
+}
+
+set args $argv
+set contin 0
+set input ""
+set errorFactor 1
+set reduce 0
+set help 0
+set breedingMethod 1
+set multiObjective 0
+set updateOnly 0
+set topUp 0
+set drain 0
+set maxRank 1
+if {[APSStrictParseArguments {contin input errorFactor reduce help breedingMethod multiObjective topUp updateOnly drain maxRank}] || \
+        ![string length  $input] || $errorFactor<=0} {
+    if $help {
+        PrintHelp
+        exit
+    }
+    return -code error "$usage"
+}
+
+
+if ![file exists $input] {
+    return -code error "not found: $input"
+}
+set rootname [file rootname $input]
+
+set preexistingJobs [llength [glob -nocomplain $rootname-??????.*]]
+if {!$contin && $preexistingJobs} {
+    return -code error "rootname in use: $rootname"
+}
+
+proc SubmitJob {args} {
+    set code ""
+    set input ""
+    APSStrictParseArguments {code input}
+
+    eval file delete -force $input.log [file rootname $input].done
+    set tmpFile [file rootname $input].csh
+    set fd [open $tmpFile w]
+    puts $fd "#!/bin/csh "
+    puts $fd "source ~/.cshrc"
+    puts $fd "unset savehist"
+    puts $fd "echo running $code $input on [exec uname -a]"
+    puts $fd "cd [pwd]"
+    puts $fd "$code $input >& $input.log"
+    close $fd
+
+    catch {exec cat $tmpFile | qsub -V -o [pwd] -j y -N [file root [file tail $input]] -hard -q all.q } result
+
+    return "$result"
+}
+
+proc SubmitRunScript {args} {
+    set script ""
+    set tagList ""
+    set valueList ""
+    set rootname ""
+    APSStrictParseArguments {script rootname tagList valueList}
+
+    eval file delete -force $rootname.log $rootname.done $rootname.run
+    set tmpFile [file rootname $rootname].csh
+    APSAddToTempFileList $tmpFile
+    set fd [open $tmpFile w]
+    puts $fd "#!/bin/csh "
+    puts $fd "source ~/.cshrc"
+    puts $fd "unset savehist"
+    puts $fd "echo running $script $rootname $tagList $valueList on [exec uname -a]"
+    puts $fd "cd [pwd]"
+    puts $fd "$script -rootname $rootname -tagList '$tagList' -valueList '$valueList' >& $rootname.log"
+    close $fd
+
+    catch {exec cat $tmpFile | qsub -V -o [pwd] -j y -N [file root [file tail $rootname]] -hard -q all.q } result
+
+    return "$result"
+}
+
+proc LoadAndCheckInputFile {} {
+    global input inputParameterList inputColumnList
+    global staggerTime
+    global executionMode generateRunScript
+    set staggerTime 0
+    set generateRunScript ""
+    if [catch {sdds load $input inputData} result] {
+        return -code error "$result"
+    }
+    set inputParameterList $inputData(ParameterNames)
+    foreach param $inputParameterList {
+        global $param
+        set $param [lindex $inputData(Parameter.$param) 0]
+    }
+    set inputColumnList $inputData(ColumnNames)
+    foreach col $inputColumnList {
+        global $col
+        set $col [lindex $inputData(Column.$col) 0]
+    }
+    foreach newParam {runScript preProcessingScript} {
+        if ![info exists $newParam] {
+            global $newParam
+            lappend inputParameterList $newParam
+            set $newParam ""
+        }
+    }
+    set count 0
+    foreach item {runScript programName generateRunScript} {
+        if [string length [set $item]] {
+            set executionMode $item
+            set count 1
+        }
+    }
+    if $count!=1 {
+        puts stderr "Error: give one and only one of runScript programName generateRunScript"
+        exit 1
+    }
+    if [string length $runScript] {
+        set inputFileExtension run
+    }
+
+    foreach pN $parameterName iV $initialValue lL $lowerLimit uL $upperLimit {
+        if {$lL>$uL} {
+            puts stderr "Error: $pN lower limit ($lL) is greater than the upper limit ($uL)."
+            exit 1
+        }
+        if {$iV>$uL || $iV<$lL} {
+            puts stderr "Error: $pN initial value ($iV) is out of range ($lL , $uL)."
+            exit 1
+        }
+    }
+}
+
+proc grndl {limit} {
+    set pi 3.14159265
+    while 1 {
+        set u1 [expr rand()]
+        set u2 [expr rand()]
+        set value [expr cos(2*$pi*$u2)*sqrt(-2*log($u1))]
+        if [expr abs($value)<=$limit] {
+            return $value
+        }
+    }
+}
+
+proc StartInitialJobs {args} {
+    set offset 0
+    set startID 0
+    APSStrictParseArguments {offset startID}
+    global inputParameterList inputColumnList
+    eval global $inputParameterList
+    eval global $inputColumnList
+    global rootname template errorFactor jobsStarted staggerTime executionMode generateRunScript
+
+    set jobID [expr $startID-1]
+
+    if {[file exists $rootname.initial] && \
+        [set rows [exec sdds2stream -rows=bar $rootname.initial]]!=0} {
+        if [catch {sdds load $rootname.initial initialData} result] {
+            return -code error "$result"
+        }
+    } else {
+        set rows 0
+    }
+
+    for {set job $offset} {$job<[expr $nParents*$childMultiplier]} {incr job} {
+        incr jobID
+        while 1 {
+            set runName [format $rootname-%06ld $jobID]
+            if [llength [glob -nocomplain ${runName}.*]]==0 {
+                break
+            }
+            incr jobID
+        }
+        set origOpt <rootname>
+        set replOpt $runName
+        set valueList ""
+        set procOpt ""
+        puts $job
+        foreach pN $parameterName iV $initialValue lL $lowerLimit uL $upperLimit eL $errorLevel {
+            set numer [expr $job % ($rows+1)]
+            if $numer==0 {
+                set value0 $iV
+            } else {
+                set value0 [lindex [lindex $initialData(Column.$pN) 0] [expr $numer - 1]]
+            }
+            if $job>=($rows+1) {
+                while 1 {
+                    set value [expr [grndl 3]*$eL*$errorFactor+$value0]
+                    if {$lL==$uL} break
+                    if {[expr $value<=$uL] && [expr $value>=$lL]} break
+                }
+            } else {
+                set value $value0
+            }
+            lappend origOpt <$pN>
+            lappend replOpt $value
+            lappend valueList $value
+            lappend procOpt -define=column,$pN,$value,type=double
+        }
+
+        scan [os editstring e6b6kay100d $runName] %d runID
+        catch {eval exec sddssequence -pipe -define=dummy,type=short -sequence=begin=0,end=0,number=1 \
+            | sddsprocess -pipe=in $runName.inp $procOpt \
+            -print=column,runName,$runName \
+            -define=column,runID,$runID,type=long } result
+        if [string compare [exec sddscheck $runName.inp] "ok"]!=0 {
+            return -code error "$result"
+        }
+        if [string length $preProcessingScript] {
+            if [catch {exec $preProcessingScript -rootname $runName \
+                           -tagList "rootname $parameterName" \
+                           -valueList "$replOpt"} result] {
+                return -code error "$result"
+            }
+            if [string length $result] {
+                puts stderr "$result"
+            }
+        }
+
+        switch $executionMode {
+            runScript {
+                puts stderr "Submitting script: $runScript for $runName"
+                catch {SubmitRunScript -script $runScript -rootname $runName \
+                    -tagList "$parameterName" -valueList "$valueList"} result
+            }
+            programName {
+                puts stderr "Submitting job"
+                exec replaceText -original=[join $origOpt ,] -replacement=[join $replOpt ,] \
+                  $inputFileTemplate $runName.$inputFileExtension
+                catch {SubmitJob -code $programName -input $runName.$inputFileExtension \
+                     } result
+            }
+            generateRunScript {
+                puts stderr "Generating and submitting script"
+                catch {eval exec $generateRunScript -rootname $runName -tagList \"$parameterName\" \
+                        -valueList \"$valueList\" -runID $runID} result
+                puts stderr "$generateRunScript returns: $result"
+            }
+            default {
+            }
+        }
+        incr jobsStarted
+        puts stderr "Script submission returns: $result"
+        if $staggerTime {
+            after [expr int($staggerTime*1000)]
+        } else {
+            after 1000
+        }
+    }
+}
+
+proc StartChildJobs {} {
+    global inputParameterList inputColumnList
+    eval global $inputParameterList
+    eval global $inputColumnList
+    global rootname template jobsToStart jobsStarted jobsRunning staggerTime executionMode generateRunScript
+
+    UpdateJobsRunning
+    set jobsToStart [expr $nParents*$childMultiplier-$jobsRunning]
+    set rows [exec sdds2stream -rows=bar $rootname.children]
+
+    if [catch {sdds load $rootname.children childData} result] {
+        return -code error "$result"
+    }
+    if {$jobsToStart>$rows} {
+        set jobsToStart $rows
+    }
+    puts stderr "Will start $jobsToStart jobs"
+    for {set job 1} {$job<=$jobsToStart} {incr job} {
+        set runName [format $rootname-%06ld $jobsStarted]
+        set origOpt <rootname>
+        set replOpt $runName
+        set valueList ""
+        set procOpt ""
+        puts stderr "job $job"
+        foreach pN $parameterName lL $lowerLimit uL $upperLimit {
+            set value [lindex [lindex $childData(Column.$pN) 0] [expr $job-1]]
+            if $lL!=$uL {
+                if [expr $value>$uL] {
+                    set value $uL
+                }
+                if [expr $value<$lL] {
+                    set value $lL
+                }
+            }
+            lappend origOpt <$pN>
+            lappend replOpt $value
+            lappend valueList $value
+            lappend procOpt -define=column,$pN,$value,type=double
+            puts stderr "$pN -> $value"
+        }
+        scan [os editstring e6b6kay100d $runName] %d runID
+        eval exec sddssequence -pipe -define=dummy,type=short -sequence=begin=0,end=0,number=1 \
+            | sddsprocess -pipe=in $runName.inp $procOpt \
+            -print=column,runName,$runName \
+            -define=column,runID,$runID,type=long
+        if [string compare [exec sddscheck $runName.inp] "ok"]!=0 {
+            return -code error "$result"
+        }
+        if [string length $preProcessingScript] {
+            if [catch {exec $preProcessingScript -rootname $runName \
+                           -tagList "$runName $parameterName" \
+                           -valueList "$replOpt"} result] {
+                return -code error "$result"
+            }
+            if [string length $result] {
+                puts stderr "$result"
+            }
+        }
+
+        switch $executionMode {
+            runScript {
+                puts stderr "Submitting script: $runScript for $runName"
+                catch {SubmitRunScript -script $runScript -rootname $runName \
+                    -tagList "$parameterName" -valueList "$valueList"} result
+            }
+            programName {
+                puts stderr "Submitting job"
+                exec replaceText -original=[join $origOpt ,] -replacement=[join $replOpt ,] \
+                  $inputFileTemplate $runName.$inputFileExtension
+                catch {SubmitJob -code $programName -input $runName.$inputFileExtension \
+                     } result
+            }
+            generateRunScript {
+                puts stderr "Generating and submitting script"
+                catch {eval exec $generateRunScript -rootname $runName -tagList \"$parameterName\" \
+                        -valueList \"$valueList\" -runID $runID} result
+                puts stderr "$generateRunScript returns: $result"
+            }
+            default {
+            }
+        }
+        incr jobsStarted
+        puts stderr "$result"
+        if $staggerTime {
+            after [expr int($staggerTime*1000)]
+        } else {
+            after 1000
+        }
+    }
+}
+
+proc SelectParents {} {
+    global inputParameterList inputColumnList
+    eval global $inputParameterList
+    eval global $inputColumnList
+    global rootname template errorFactor reduce multiObjective nParents breedingMethod
+
+    set doneList [lsort [glob -nocomplain $rootname-??????.done]]
+    puts stderr "[llength $doneList] completed jobs"
+    set procList [lsort [glob -nocomplain $rootname-??????.proc]]
+    puts stderr "[llength $procList] processed jobs"
+    foreach file $doneList {
+        set runName [file rootname $file]
+        scan [os editstring e6b6kay100d $runName] %d runID
+        if {[string length $postProcessingScript] && ![file exists $runName.proc]} {
+            puts stderr "Processing $runName ($runID) ..."
+            if {[catch {exec $postProcessingScript -rootname $runName \
+                -runID $runID } result]} {
+                puts stderr "Problem $runName processing: $result"
+                eval file delete -force [glob $runName.*]
+                continue
+            }
+            if [file exist $runName.proc] {
+                puts stderr "Processing completed"
+                lappend procList $runName.proc
+            } else {
+                puts stderr "Anomalous processing failure for $runName"
+            }
+        }
+    }
+    puts stderr "[llength $procList] processed jobs"
+    if ![llength $procList] return
+
+    puts stderr "Merging [llength $procList] processed jobs"
+    if ![file exists $rootname.all] {
+        eval exec sddscombine $procList -merge -pipe=out \
+            | sddssort -pipe=in -col=runID -unique $rootname.all
+    } else {
+        eval exec sddscombine $rootname.all $procList -merge -pipe=out \
+            | sddssort -pipe=in -column=runID -unique $rootname.all1
+        file rename -force $rootname.all1 $rootname.all
+    }
+
+    if !$multiObjective {
+        eval exec sddscombine $rootname.all -merge -pipe=out \
+            | sddsprocess -pipe "-print=col,pvString,%e,penaltyValue" \
+            -match=col,pvString=+nan,! -match=col,pvString=+inf,! \
+            | sddssort -pipe -col=penaltyValue,incr \
+            | sddsprocess -pipe=in $rootname.best -clip=$nParents,0,invert
+    } else {
+        global maxRank
+        set columns [exec sddsquery -col $rootname.all]
+        set opt ""
+        foreach col $columns {
+            if [string match "*Penalty*" $col] {
+                lappend opt -col=$col
+            }
+        }
+        if $breedingMethod==0 {
+            # >2 parent breeding, using N top-ranked solutions
+            if [catch {eval exec sddssort -nondominate $opt $rootname.all $rootname.sort
+                        exec sddsprocess $rootname.sort -filter=col,Rank,0,$maxRank $rootname.best1 } result] {
+                puts stderr "$result"
+                exit 1
+            }
+            set rows [exec sdds2stream -rows=bar $rootname.best1]
+            if {$rows<$nParents} {
+                if [catch {exec sddsprocess $rootname.sort -clip=$nParents,0,invert $rootname.best} result] {
+                    puts stderr "$result"
+                    exit 1
+                }
+            } else {
+                file rename -force $rootname.best1 $rootname.best
+            }
+        } else {
+            # 2-parent breeding, choosing from all top-ranked solutions
+            if [catch {eval exec sddssort -nondominate $opt $rootname.all $rootname.sort
+                        exec sddsprocess $rootname.sort -define=param,maxRank,$maxRank -filter=col,Rank,0,$maxRank $rootname.best } result] {
+                puts stderr "$result"
+                exit 1
+            }
+        }
+    }
+}
+
+# In this algorithm a child may have more than two parents.
+proc BreedNewJobs0 {} {
+    global inputParameterList inputColumnList
+    eval global $inputParameterList
+    eval global $inputColumnList
+    global rootname template errorFactor nParents
+
+    set paramFileList ""
+    set randomizeOptList ""
+    foreach pN $parameterName eL $errorLevel {
+        puts stderr "Preparing stock for breeding for $pN"
+        eval exec sddscombine -merge \
+            [APSReplicateItem -item $rootname.best -number $childMultiplier] \
+            -pipe=out -retain=col,$pN | sddsprocess -pipe -define=col,RN,rnd \
+            | sddssort -pipe -col=RN \
+        | sddsprocess -pipe=in $rootname.best.$pN -clip=$nParents,0,invert
+        lappend paramFileList $rootname.best.$pN
+        lappend randomizeOptList "-redefine=col,$pN,$pN 3 grndl $eL * $errorFactor * +"
+    }
+    puts stderr "Breeding"
+    eval exec sddsxref $paramFileList -pipe=out \
+        | sddsprocess -pipe=in $rootname.children $randomizeOptList
+}
+
+# This uses an algorithm whereby only two parents are bred
+
+proc BreedNewJobs1 {} {
+    global inputParameterList inputColumnList
+    eval global $inputParameterList
+    eval global $inputColumnList
+    global rootname template errorFactor
+
+    foreach pN $parameterName eL $errorLevel {
+        lappend procOptList -process=$pN,spread,%sSpread
+        lappend procOptList -process=$pN,min,%sMin
+        lappend procOptList "-redefine=parameter,$pN,${pN}Spread rnd * ${pN}Min + 3 grndl $eL * $errorFactor * + "
+    }
+
+    set number1 [expr $childMultiplier*$nParents]
+    set number [expr [llength $parameterName]*$childMultiplier]
+    if $number>$number1 {
+        set number $number1
+    }
+    eval exec sddscombine [APSReplicateItem -item $rootname.best -number $number] \
+        -retain=column,[join $parameterName ,] -pipe=out \
+        | sddsprocess -pipe -define=column,RN,rnd \
+        | sddssort -pipe -column=RN \
+        | sddsprocess -pipe -clip=2,0,invert $procOptList \
+        | sddscollapse -pipe=in $rootname.children
+}
+
+proc RemoveLosers {} {
+    global rootname template doneList jobsToStart errorFactor
+    set bestRunList [APSGetSDDSColumn -column runName -fileName $rootname.best]
+    foreach done $doneList {
+        if [lsearch -exact $bestRunList [file rootname $done]]==-1 {
+            puts "Removing [file rootname $done]"
+            catch {eval file delete -force [glob [file rootname $done]]}
+            catch {eval file delete -force [glob [file rootname $done].*]}
+            catch {eval file delete -force [glob [file rootname $done]-*.*]}
+        }
+    }
+}
+
+proc UpdateJobsRunning {} {
+    global rootname jobsRunning jobsStarted jobsToProc inputFileExtension jobsProc jobsCurrent
+    set jobsCurrent [llength [glob -nocomplain $rootname-??????.csh]]
+    set jobsDone [llength [glob -nocomplain $rootname-??????.done]]
+    set jobsProc [llength [glob -nocomplain $rootname-??????.proc]]
+    set jobsToProc [expr $jobsDone-$jobsProc]
+    set jobsRunning [expr $jobsCurrent-$jobsDone]
+    set message "[clock format [clock seconds]]: Jobs: current=$jobsCurrent, done=$jobsDone, proc'd=$jobsProc, toProc=$jobsToProc, running=$jobsRunning"
+    puts -nonewline stderr $message
+    for {set i 0} {$i<[string length $message]} {incr i} {
+        puts -nonewline stderr "\b"
+    }
+}
+
+if [file exists geneticOptimizer.local] {
+    source geneticOptimizer.local
+}
+
+LoadAndCheckInputFile
+puts stderr "Input file read and checked."
+
+if {!$contin} {
+    if {[file exists $rootname.all]} {
+        puts stderr "Error: $rootname.all file found but -contin 1 not given"
+        exit 1
+    }
+    set jobsRunning 0
+    set jobsStarted 0
+    StartInitialJobs
+    after 3000
+    set doWait 1
+} else {
+    set doWait 0
+    if [catch {exec sddsprocess $rootname.all -pipe=out -process=runID,max,runIDMax \
+                 | sdds2stream -pipe=in -parameter=runIDMax} result] {
+        set result -1
+    }
+    set jobsStarted [expr int($result)+1]
+    while {[llength [glob -nocomplain [format $rootname-%06d.* $jobsStarted]]]!=0} {
+        incr jobsStarted
+    }
+    UpdateJobsRunning
+    puts stderr "\n$jobsStarted jobs started for this optimization so far"
+    puts stderr "$jobsToProc jobs need to be processed."
+}
+
+if $topUp {
+    UpdateJobsRunning
+    if $jobsRunning<[expr $childMultiplier*$nParents] {
+        StartInitialJobs -offset $jobsRunning -startID $jobsRunning
+    }
+}
+
+set firstPass 1
+
+while {$jobsStarted<[expr $nTotalJobs+$nParents*$childMultiplier]} {
+    if $sleepTime {
+        after [expr int($sleepTime*1000)]
+    } else {
+        after 120000
+    }
+    UpdateJobsRunning
+    if {!$updateOnly && !($firstPass && $jobsRunning==0) && $jobsRunning>=[expr $childMultiplier*$nParents]} {
+        continue
+    }
+    puts stderr "\n"
+    set firstPass 0
+    puts stderr "Selecting parents..."
+    set doneList [lsort [glob -nocomplain $rootname-??????.done]]
+    if [catch {SelectParents} result] {
+        puts stderr "$result"
+    }
+    set procList [lsort [glob -nocomplain $rootname-??????.proc]]
+    if [file exists $rootname.best] {
+        if $reduce {
+            puts stderr "Removing losers..."
+            if [catch {RemoveLosers} result] {
+                puts stderr "$result"
+                continue
+            }
+        }
+        if $updateOnly exit
+        if $drain {
+            after 3000
+            continue
+        }
+        puts stderr "Breeding..."
+        if [catch {BreedNewJobs$breedingMethod} result] {
+            puts stderr "$result"
+            continue
+        }
+        puts stderr "Starting new jobs..."
+        if [catch {StartChildJobs} result] {
+            puts stderr "$result"
+            continue
+        }
+    }
+}

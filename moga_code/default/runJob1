@@ -51,8 +51,6 @@ foreach value $valueList tag $tagList {
 
 # Open log file
 set fd [open $rootname.log a]
-puts $fd "$rootname   $macroList"
-flush $fd
 
 # Use TMPDIR if defined, otherwise make a subdirectory
 set oldDir [pwd]
@@ -74,20 +72,44 @@ flush $fd
 
 cd $env(TMPDIR)
 
-# Perform linear matching
-catch {exec elegant matchTemplate.ele -macro=[join $macroList ,]} result
+# Perform linear matching and chromaticity correction
+puts $fd "\nrunning elegant for matching and chromaticity correction"
+puts $fd "Check $oldDir/$rootname-match.log for status"
+catch {exec elegant matchTemplate.ele -macro=[join $macroList ,] \
+       >& $oldDir/$rootname-match.log} result
 puts $fd "linear matching: $result"
 flush $fd
 
-# perform chromaticity correction, DA, LMA
-puts $fd "running elegant for chromaticity, DA, LMA"
-puts $fd "Check $oldDir/$rootname-main.log for status"
+# Copy matching results back to the main directory
+puts $fd "Copying matching results back to the main directory:"
+foreach exten {.twi .new} {
+    if [catch {file copy -force ./$rootname$exten $oldDir/$rootname$exten} result] {
+        puts $fd "** Problem copying ./$rootname$exten to $oldDir/$rootname$exten: $result"
+    } else {
+        puts $fd "Copied ./$rootname$exten to $oldDir/$rootname$exten"
+        }
+    }
+
+# perform DA, LMA
+puts $fd "\nrunning elegant for DA, LMA"
+puts $fd "Check $oldDir/$rootname-track.log for status"
 flush $fd
 catch {exec elegant evalTemplate.ele -macro=[join $macroList ,] \
-       >& $oldDir/$rootname-main.log} result
+       >& $oldDir/$rootname-track.log} result
 puts $fd "tracking: $result"
 flush $fd
 
+# Copy tracking results back to the main directory
+puts $fd "Copying tracking results back to the main directory:"
+foreach exten {.aper .mmap .w1 .fin .orb .erl .cor2} {
+    if [catch {file copy -force ./$rootname$exten $oldDir/$rootname$exten} result] {
+        puts $fd "** Problem copying ./$rootname$exten to $oldDir/$rootname$exten: $result"
+    } else {
+        puts $fd "Copied ./$rootname$exten to $oldDir/$rootname$exten"
+        }
+    }
+
+puts $fd "\nProcessing tracking data:"
 if [file exists $rootname.done0] {
     set failed 0
     catch {exec processJob1 -rootname $rootname -oldDir $oldDir \
@@ -95,25 +117,25 @@ if [file exists $rootname.done0] {
           -coupling $coupling -current $current -bunches $bunches \
           -sigmas $sigmas -deltaLimit $deltaLimit}  result
     if ![file exists $rootname.proc] {
-    puts $fd "processing failed: $result"
-    flush $fd
-    mkdir -p "$oldDir/errorLog/"
-    foreach file [glob -nocomplain ${rootname}*] {
-        file copy -force $file $oldDir/errorLog/$file
+        puts $fd "processing failed: $result"
+        flush $fd
+        exec mkdir -p "$oldDir/errorLog/"
+        foreach file [glob -nocomplain ${rootname}*] {
+            file copy -force $file $oldDir/errorLog/$file
+            }
+        }
     }
-    }
-}
+puts $fd "Data processed."
 
-puts $fd "[glob -nocomplain ${rootname}*]"
-
-# Copy files back to the main directory
-foreach exten {.twi .proc .aper .mmap .w1 .naff .fin .new .orb .erl .cor2} {
+# Copy processing files back to the main directory
+puts $fd "Copying processing results back to the main directory:"
+foreach exten {.naff .proc} {
     if [catch {file copy -force ./$rootname$exten $oldDir/$rootname$exten} result] {
-    puts $fd "** Problem copying ./$rootname$exten to $oldDir/$rootname$exten: $result"
+        puts $fd "** Problem copying ./$rootname$exten to $oldDir/$rootname$exten: $result"
     } else {
-    puts $fd "Copied ./$rootname$exten to $oldDir/$rootname$exten"
+        puts $fd "Copied ./$rootname$exten to $oldDir/$rootname$exten"
+        }
     }
-}
 close $fd
 
 # Create semaphore to tell the optimizer that this run is done

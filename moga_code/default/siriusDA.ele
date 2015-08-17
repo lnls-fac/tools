@@ -1,17 +1,4 @@
 &run_setup
-	lattice = si_v10_c01.lte
-    use_beamline = anelcomp
-	p_central_mev = 3e3
-	default_order = 2
-	magnets = %s.mag
-&end
-
-&twiss_output
-	filename = %s.twi
-	radiation_integrals = 1
-&end
-
-&run_setup
     lattice = si_v10_c01.lte,
     use_beamline = anelcomprf,
     p_central_mev = 3e3

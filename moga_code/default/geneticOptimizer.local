@@ -47,6 +47,7 @@ proc SubmitRunScript {args} {
     close $fd
 
     catch {exec cat $tmpFile | qsub -q linux.q -V -o [pwd] -j y -N [file root [file tail $rootname]] } result
+#    catch {exec cat $tmpFile | qsub -q fila -V -o [pwd] -j y -N [file root [file tail $rootname]] } result
 
     return "$result"
 }
