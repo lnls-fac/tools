@@ -16,7 +16,7 @@ require_once('FacTextReplacer.php');
 
 $wgExtensionCredits['other'][] = array(
     'name' => 'Parameters',
-    'version' => '0.5.0',
+    'version' => '0.5.1',
     'author' => array('Afonso Haruo Carnielli Mukai'),
     'description' => 'Include parameterised and derived values in articles'
 );
@@ -180,7 +180,7 @@ function fac_add_link_to_parameters($parameters)
 
 function fac_get_parameter_link($name, $label=false)
 {
-    if (!$label)
+    if ($label === false)
         $label = $name;
 
     $s = '[[' . FacParameter::parameter_namespace . $name . '|'
