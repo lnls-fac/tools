@@ -2419,16 +2419,16 @@ global PLOT2SVG_globals
 if strcmp(get(ax,'XTickLabelMode'),'auto') && strcmp(get(ax,'XScale'),'linear')
     fontsize=convertunit(get(ax,'FontSize'),get(ax,'FontUnits'),'points', axpos(4));   % convert fontsize to inches
     font_color=searchcolor(ax,get(ax,'XColor'));
-    if PLOT2SVG_globals.octave
+%     if PLOT2SVG_globals.octave  %% commented by Fernando 2018/05/24
         % Octave stores XTickLabel in a cell array, which does not work nicely with str2num. --Jakob Malm
         axlabelx = get(ax, 'XTickLabel');
         numlabels = zeros(length(axlabelx), 1);
         for ix = 1:length (axlabelx)
             numlabels(ix) = str2num(axlabelx{ix});
         end
-    else
-        numlabels = str2num(get(ax,'XTickLabel'));
-    end
+%     else
+%         numlabels = str2num(get(ax,'XTickLabel'));
+%     end
     labelpos = axxtick;%get(ax,'XTick');
     numlabels = numlabels(:);
     labelpos = labelpos(:);
@@ -2444,16 +2444,16 @@ end
 if strcmp(get(ax,'YTickLabelMode'),'auto') && strcmp(get(ax,'YScale'),'linear')
     fontsize=convertunit(get(ax,'FontSize'),get(ax,'FontUnits'),'points', axpos(4));
     font_color=searchcolor(ax,get(ax,'YColor'));
-    if PLOT2SVG_globals.octave
+%     if PLOT2SVG_globals.octave  %% commented by Fernando 2018/05/24
         % Octave stores YTickLabel in a cell array, which does not work nicely with str2num. --Jakob Malm
         axlabely = get(ax, 'YTickLabel');
         numlabels = zeros(length(axlabely), 1);
         for ix = 1:length(axlabely)
             numlabels(ix) = str2num(axlabely{ix});
         end        
-    else
-        numlabels = str2num(get(ax,'YTickLabel'));
-    end
+%     else
+%         numlabels = str2num(get(ax,'YTickLabel'));
+%     end
     labelpos = axytick;%get(ax,'YTick');
     numlabels = numlabels(:);
     labelpos = labelpos(:);
@@ -2469,16 +2469,16 @@ end
 if strcmp(get(ax,'ZTickLabelMode'),'auto') && strcmp(get(ax,'ZScale'),'linear')
     fontsize=convertunit(get(ax,'FontSize'),get(ax,'FontUnits'),'points', axpos(4));
     font_color=searchcolor(ax,get(ax,'ZColor'));
-    if PLOT2SVG_globals.octave
+%     if PLOT2SVG_globals.octave  %% commented by Fernando 2018/05/24
         % Octave stores ZTickLabel in a cell array, which does not work nicely with str2num. --Jakob Malm
         axlabelz = get (ax, 'ZTickLabel');
         numlabels = zeros(length(axlabelz), 1);
         for ix = 1:length(axlabelz)
             numlabels(ix) = str2num(axlabelz{ix});
         end
-    else
-        numlabels = str2num(get(ax,'ZTickLabel'));
-    end
+%     else
+%         numlabels = str2num(get(ax,'ZTickLabel'));
+%     end
     labelpos = axztick;%get(ax,'ZTick');
     numlabels = numlabels(:);
     labelpos = labelpos(:);
